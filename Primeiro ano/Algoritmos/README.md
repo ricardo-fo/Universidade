@@ -1,1 +1,1 @@
-Those files are, all they, classroom exercises.
+Those files were, all they, classroom exercises.
