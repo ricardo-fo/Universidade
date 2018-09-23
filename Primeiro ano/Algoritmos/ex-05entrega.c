@@ -4,7 +4,7 @@ e retorne o número de vezes que aquela palavra aparece no arquivo
 */
 #include <stdio.h>
 #include <string.h>
-
+ 
 int main()
 {
 	FILE * pin;
