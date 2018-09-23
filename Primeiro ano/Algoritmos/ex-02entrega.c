@@ -1,6 +1,6 @@
-/*
-FaÁa um programa em Linguagem C que gere 100.000 caracteres aleatÛrios e grave em um arquivo texto.
-Caracteres v·lidos: A-Z, a-z, 0-9;
+/* 
+Fa√ßa um programa em Linguagem C que gere 100.000 caracteres aleat√≥rios e grave em um arquivo texto.
+Caracteres v√°lidos: A-Z, a-z, 0-9;
 */
 #include <stdio.h>
 #include <stdlib.h>
