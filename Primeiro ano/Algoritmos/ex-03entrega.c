@@ -1,5 +1,5 @@
 /*
-Faça um programa em C com duas funções: uma para gravar em um arquivo e outra para
+3.	Faça um programa em C com duas funções: uma para gravar em um arquivo e outra para
 escrever. O programa principal deve conter um menu com as opções: 1- Gravar Pessoa;
 2- Exibir Listagem; 3- Sair. Ao escolher Gravar Pessoa, a função void gravar(void) deve
 ser chamada; ao escolher Exibir Listagem, o programa deve exibir o conteúdo do arquivo
@@ -33,17 +33,22 @@ Se a idade for maior ou igual que 18 anos, escrever  OK
 */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 void gravarPessoa(void);
 void exibirListagem(void);
 
-file = "macedo.txt";
+char file[] = "macedo.txt";
 
 int main()
 {
+	FILE * prime;
 	int choice, a = 1;
+	if((prime = fopen(file, "r")) == NULL)
+		prime = fopen(file, "w");
+	fclose(prime);
 	while(a){
-		printf("Escolha uma das opcoes abaixo:\n1- Gravar Pessoa;\n2- Exibir Listagem;\n3- Sair\n>>> ");
+		printf("\nEscolha uma das opcoes abaixo:\n1- Gravar Pessoa;\n2- Exibir Listagem;\n3- Sair\n>>> ");
 		scanf("%d", &choice);
 		switch(choice){
 				case 1:
@@ -56,7 +61,6 @@ int main()
 				a = 0;
 		}
 	}
-
 	return 0;
 }
 
@@ -65,16 +69,23 @@ void gravarPessoa()
 	FILE * pin;
 	char name[51], born[5];
 
-	printf("Informe o nome:\n>>> ");
+	printf("\nInforme o nome:\n>>> ");
 	scanf(" %50[^\n]", name);
-	printf("Informe o ano de nascimento:\n>>> ");
+	printf("\nInforme o ano de nascimento:\n>>> ");
 	scanf(" %4s", born);
 	char dots[51] = "                                                  ";
 
-	pin = fopen(file,"a");
+	if((pin = fopen(file,"a")) == NULL){
+        printf("\nArquivo vazio ou inexistente!\n");
+        exit(1);
+	}
 	fprintf(pin,"%s",name);
 	fprintf(pin,"%s",&dots[strlen(name)]);
 	fprintf(pin,"%s",born);
+	if((2018 - atoi(born)) >=18)
+		fprintf(pin,"%s", " OK");
+	else
+		fprintf(pin,"%s"," <18");
 	fprintf(pin,"%c",'\n');
 	fclose(pin);
 }
@@ -82,12 +93,12 @@ void gravarPessoa()
 void exibirListagem()
 {
 	FILE * pout;
-	char show[55];
+	char show;
 
 	pout = fopen(file,"r");
 	while(!(feof(pout))){
-		fscanf(pout,"%s",show);
-		printf("%s\n", show);
+		show = fgetc(pout);
+		printf("%c", show);
 	}
 	fclose(pout);
 
