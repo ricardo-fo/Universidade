@@ -47,22 +47,22 @@ int main()
 			cpyFileBin(pone, ptwo);
 			fclose(pone);
 			fclose(ptwo);
-		}else{
-            if((pone = fopen(file_one, "r")) == NULL){
-                printf("Arquivo '%s' vazio ou inexistente!\nImpossivel fazer a gravacao!\n", file_one);
-                return 2;
-            }
-            ptwo = fopen(file_three,"w");
-			cpyFile(pone, ptwo);
-			fclose(pone);
-			if((pone = fopen(file_two, "r")) == NULL){
-                printf("Arquivo '%s' vazio ou inexistente!\nImpossivel prosseguir com a gravacao!\n", file_two);
-                return 2;
+			}else{
+            	if((pone = fopen(file_one, "r")) == NULL){
+                	printf("Arquivo '%s' vazio ou inexistente!\nImpossivel fazer a gravacao!\n", file_one);
+                	return 2;
+           		}
+            	ptwo = fopen(file_three,"w");
+				cpyFile(pone, ptwo);
+				fclose(pone);
+				if((pone = fopen(file_two, "r")) == NULL){
+                	printf("Arquivo '%s' vazio ou inexistente!\nImpossivel prosseguir com a gravacao!\n", file_two);
+               		return 2;
+				}
+				cpyFile(pone, ptwo);
+				fclose(pone);
+				fclose(ptwo);
 			}
-			cpyFile(pone, ptwo);
-			fclose(pone);
-			fclose(ptwo);
-		}
 	}
     return 0;
 }
