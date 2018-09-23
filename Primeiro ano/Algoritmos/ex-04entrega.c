@@ -41,8 +41,8 @@ int main()
 			fclose(pone);
 			fclose(ptwo);
 		}else{
-            ptwo = fopen(file_three,"w");
-            pone = fopen(file_one, "r");
+            		ptwo = fopen(file_three,"w");
+            		pone = fopen(file_one, "r");
 			cpyFile(pone, ptwo);
 			fclose(pone);
 			pone = fopen(file_two, "r");
@@ -69,14 +69,14 @@ void cpyFile(FILE * pone, FILE * ptwo)
 	/*Armazena o conteúdo do arquivo passado em uma string e grava essa string no novo arquivo*/
 	char ch[1000000];
 	while(!feof(pone)){
-        fgets(ch, 1000000, pone);
-        fputs(ch, ptwo);
+        	fgets(ch, 1000000, pone);
+        	fputs(ch, ptwo);
 	}
 }
 
 void cpyFileBin(FILE * pone, FILE * ptwo)
 {
-    /*Calcula o tamanho do arquivo binário em bytes*/
+    	/*Calcula o tamanho do arquivo binário em bytes*/
 	long len;
 	fseek(pone, 0, SEEK_END);
 	len = ftell(pone);
