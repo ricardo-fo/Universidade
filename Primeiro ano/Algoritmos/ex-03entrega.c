@@ -1,5 +1,5 @@
 /*
-3.	Faça um programa em C com duas funções: uma para gravar em um arquivo e outra para
+Faça um programa em C com duas funções: uma para gravar em um arquivo e outra para
 escrever. O programa principal deve conter um menu com as opções: 1- Gravar Pessoa;
 2- Exibir Listagem; 3- Sair. Ao escolher Gravar Pessoa, a função void gravar(void) deve
 ser chamada; ao escolher Exibir Listagem, o programa deve exibir o conteúdo do arquivo
@@ -92,3 +92,9 @@ void exibirListagem()
 	fclose(pout);
 
 }
+/*
+Nome: Ricardo de Freitas Olveira.
+Curso: Ciência da Computação.
+R.A.: 5934078.
+Exe.: 03.
+*/
