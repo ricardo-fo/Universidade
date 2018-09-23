@@ -34,17 +34,15 @@ void criar()
 	for(i = 0; i < 2; i++){
 		for(j = 0; j < 2; j++){
 			matrix[i][j] = rand() % 101;
-			//printf("\t%d", matrix[i][j]);
 		}
-		//printf("\n");
 	}
 	fwrite(matrix, sizeof(int), 4, pin);
 	fclose(pin);
 
 	pin = fopen("pwd.bin", "wb");
-	printf("Password:\n>>> ");
+	printf("Senha:\n>>> ");
 	scanf(" %8[^\n]", password);
-	while(ch = getchar() != '\n');//Limpeza do buffer
+	while(ch = getchar() != '\n');//Limpeza do buffer do teclado
 	while(strlen(password) < 6 || strlen(password) > 8){//Limitação do tamanho da senha
         printf("\nA senha deve ter entre 6 e 8 caracteres!\nPassword:\n>>> ");
 		scanf(" %8[^\n]", password);
@@ -56,17 +54,25 @@ void criar()
 void girar()
 {
 	FILE * pout;
-	int matrix[2][2];
+	int matrix[2][2], i, j;
 
 	if((pout = fopen("matriz.dat", "rb")) == NULL){
-		printf("Problemas ao abrir o arquivo 'matriz.dat'\n");
+		printf("\nProblemas ao abrir o arquivo 'matriz.dat'\n");
 		exit(1);
 	}
 	fread(matrix, sizeof(int), 4, pout);
 	fclose(pout);
+	system("cls");
+	printf("MATRIZ GERADA ALEATORIAMENTE:\n");
+	for(i = 0; i < 2; i++){
+		for(j = 0; j < 2; j++){
+			printf("%d\t", matrix[i][j]);
+		}
+		printf("\n");
+	}
 
 	if((pout = fopen("pwd.bin","rb")) == NULL){
-		printf("Problemas ao abrir o arquivo 'pwd.bin'\n");
+		printf("\nProblemas ao abrir o arquivo 'pwd.bin'\n");
 		exit(1);
 	}
 	char password[9];
@@ -76,30 +82,29 @@ void girar()
 	char acess[9], ch;
 	printf("\nInforme a senha:\n>>> ");
 	scanf(" %8[^\n]", acess);
-	while(ch = getchar() != '\n');//Limpeza do buffer
+	while(ch = getchar() != '\n');//Limpeza do buffer do teclado
 	/*COMO O EXERCÍCIO NÃO ESPECIFICA QUANTOS GRAUS A MATRIZ DEVE SER GIRADA, ASSUMO O VALOR DE 90°
 		| A  B | > | D  A |
 		| D  C | > | C  B |
 	Rotação:*/
 	//printf("password = %s\nacess = %s\n", password, acess);
 	if(!strcmp(password, acess)){
-		int aux, auxx;
-		aux = matrix[0][1]; // aux = B
+		i = matrix[0][1]; // aux = B
 		matrix[0][1] = matrix[0][0]; // (0,1) = A
-		auxx = matrix[1][1]; // auxx = C
-		matrix[1][1] = aux; // (1,1) = B
-		aux = matrix[1][0]; // aux = D
-		matrix[1][0] = auxx; // (1,0) = C
-		matrix[0][0] = aux; // (0,0) = D
-		exit(0);
-	}/*
-	int i, j;
-	for(i = 0; i < 2; i++){
-		for(j = 0; j < 2; j++){
-			printf("\t%d", matrix[i][j]);
+		j = matrix[1][1]; // auxx = C
+		matrix[1][1] = i; // (1,1) = B
+		i = matrix[1][0]; // aux = D
+		matrix[1][0] = j; // (1,0) = C
+		matrix[0][0] = i; // (0,0) = D
+		printf("\nMATRIZ ROTACIONADA 90 graus:\n");
+		for(i = 0; i < 2; i++){
+			for(j = 0; j < 2; j++){
+				printf("%d\t", matrix[i][j]);
+			}
+			printf("\n");
 		}
-		printf("\n");
-	}*/
+		exit(0);
+	}
 	printf("Senhas incompativeis!\n");
 	exit(1);
 }
