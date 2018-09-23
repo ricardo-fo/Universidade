@@ -1,7 +1,7 @@
 #include <stdio.h>
-/*
-Faça um programa em Linguagem C que receba do usuário um arquivo texto, e mostre na tela quantas linhas esse arquivo possui.
-Considere o ‘\n’ como terminador de linha;
+/* 
+FaÃ§a um programa em Linguagem C que receba do usuÃ¡rio um arquivo texto, e mostre na tela quantas linhas esse arquivo possui.
+Considere o â€˜\nâ€™ como terminador de linha;
 */
 
 int main()
