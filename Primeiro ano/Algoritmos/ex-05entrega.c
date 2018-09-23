@@ -14,16 +14,26 @@ int main()
 	printf("Palavra:\n>>> ");
 	scanf(" %300[^\n]", word);
 	if((pin = fopen(file, "r")) == NULL){
-		printf("Arquivo vazio!\n");
+		printf("Arquivo vazio ou inexistente!\n");
 		return 1;
 	}
-	int cont = 0;
-	char storage[1001];
-	while(!(feof(pin))){
-		fscanf(pin, "%s", storage);
-		if(!strcmp(storage,word))
-			cont++;
+	int cont = 0, i;
+	char ch[10001];
+
+	while(!feof(pin)){
+        fscanf(pin, "%s", ch);
+        for(i = 0; ch[i] != '\0'; i++){
+            if(!strncmp(&ch[i], word, strlen(word)))
+                cont++;
+        }
 	}
-	printf("%d\n", cont);
+    fclose(pin);
+	printf("Ocorrencia da palavra no arquivo: %d\n", cont);
 	return 0;
 }
+/*
+Nome: Ricardo de Freitas Olveira.
+Curso: Ciência da Computação.
+R.A.: 5934078.
+Exe.: 05.
+*/
