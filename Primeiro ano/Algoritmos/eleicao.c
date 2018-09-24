@@ -91,7 +91,8 @@ void apura()
     }
     /*AMOSTRAGEM*/
     char dots[51] = "                                                  ";
-    printf("\n\aAMOSTRAGEM\n******************************************************************************************************\n");
-    for(i = 14; i > 0; i--)
-        printf("\n %d - [%d]%s %s %d votos | %.04f%%\n",15 - i, numeros[i], nomes[i], &dots[strlen(nomes[i])], storage[i], (storage[i] / 24000000.0)*100);
+    printf("\a\n***********************************************************************************\n");
+    printf("Codigo  Candidato                                            Votos   Porcentagem\n");
+    for(i = 14; i >= 0; i--)
+        printf("\n %02d     %s %s %d | %.04f%% \n", numeros[i], nomes[i], &dots[strlen(nomes[i])], storage[i], (storage[i] / 24000000.0)*100);
 }
