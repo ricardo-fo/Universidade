@@ -92,13 +92,13 @@ void cpyFile(FILE * pone, FILE * ptwo)
 
 int cpyFileBin(FILE * pone, FILE * ptwo, int * arm)
 {
-    static int i = 0;//i representa a quantidade de números adicionados no arquivo
+	static int i = 0;//i representa a quantidade de números adicionados no arquivo
 	/*Grava o conteúdo dos arquivos para o novo arquivo*/
 	fread(&arm[i], sizeof(int), MAX, pone);
 	while(arm[i] != 0){
         	i++;
     	}
-    return i;
+    	return i;
 }
 /*
 Nome: Ricardo de Freitas Olveira.
