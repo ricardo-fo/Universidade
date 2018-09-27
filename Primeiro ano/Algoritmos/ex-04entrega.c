@@ -2,7 +2,7 @@
 Faça um programa que receba dois arquivos do usuário, e crie um terceiro
 arquivo com o conteúdo dos dois primeiros juntos (o conteúdo do primeiro
 seguido do conteúdo do segundo).
-*/ 
+*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -51,15 +51,15 @@ int main()
 			fclose(pone);
 			fclose(ptwo);
 		}else{
-           		if((pone = fopen(file_one, "r")) == NULL){
+            		if((pone = fopen(file_one, "r")) == NULL){
                 		printf("\nArquivo '%s' vazio ou inexistente!\nImpossivel fazer a gravacao!\n", file_one);
                 		return 2;
             		}
             		ptwo = fopen(file_three,"w");
-			cpyFile(pone, ptwo);
-			fclose(pone);
+	    		cpyFile(pone, ptwo);
+	    		fclose(pone);
 			if((pone = fopen(file_two, "r")) == NULL){
-               			printf("\nArquivo '%s' vazio ou inexistente!\nImpossivel prosseguir com a gravacao!\n", file_two);
+                		printf("\nArquivo '%s' vazio ou inexistente!\nImpossivel prosseguir com a gravacao!\n", file_two);
                 		return 2;
 			}
 			cpyFile(pone, ptwo);
@@ -67,7 +67,7 @@ int main()
 			fclose(ptwo);
 		}
 	}
-    	return 0;
+    return 0;
 }
 
 void getExt(const char * file, char * ext)
@@ -85,20 +85,22 @@ void cpyFile(FILE * pone, FILE * ptwo)
 	/*Armazena o conteúdo do arquivo passado numa string e grava essa string no novo arquivo*/
 	char ch[MAX];
 	while(!feof(pone)){
-        	fgets(ch, sizeof(ch), pone);
-        	fputs(ch, ptwo);
+        fgets(ch, sizeof(ch), pone);
+        if(feof(pone))
+            break;
+        fputs(ch, ptwo);
 	}
 }
 
 int cpyFileBin(FILE * pone, FILE * ptwo, int * arm)
 {
-	static int i = 0;//i representa a quantidade de números adicionados no arquivo
+    static int i = 0;//i representa a quantidade de números adicionados no arquivo
 	/*Grava o conteúdo dos arquivos para o novo arquivo*/
 	fread(&arm[i], sizeof(int), MAX, pone);
 	while(arm[i] != 0){
-        	i++;
-    	}
-    	return i;
+        i++;
+    }
+    return i;
 }
 /*
 Nome: Ricardo de Freitas Olveira.
