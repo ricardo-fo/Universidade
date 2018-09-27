@@ -51,7 +51,7 @@ int main()
 		printf("\nEscolha uma das opcoes abaixo:\n1- Gravar Pessoa;\n2- Exibir Listagem;\n3- Sair\n>>> ");
 		scanf("%d", &choice);
 		switch(choice){
-				case 1:
+			case 1:
 				gravarPessoa();
 				break;
 			case 2:
@@ -76,8 +76,8 @@ void gravarPessoa()
 	char dots[51] = "                                                  ";
 
 	if((pin = fopen(file,"a")) == NULL){
-        printf("\nArquivo vazio ou inexistente!\n");
-        exit(1);
+        	printf("\nArquivo vazio ou inexistente!\n");
+        	exit(1);
 	}
 	fprintf(pin,"%s",name);
 	fprintf(pin,"%s",&dots[strlen(name)]);
