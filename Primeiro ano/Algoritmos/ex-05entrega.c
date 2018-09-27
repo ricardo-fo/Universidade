@@ -21,13 +21,13 @@ int main()
 	char ch[10001];
 
 	while(!feof(pin)){
-        fscanf(pin, "%s", ch);
-        for(i = 0; ch[i] != '\0'; i++){
-            if(!strncmp(&ch[i], word, strlen(word)))
-                cont++;
-        }
+        	fscanf(pin, "%s", ch);
+        	for(i = 0; ch[i] != '\0'; i++){
+            		if(!strncmp(&ch[i], word, strlen(word)))
+                		cont++;
+        	}
 	}
-    fclose(pin);
+    	fclose(pin);
 	printf("Ocorrencia da palavra no arquivo: %d\n", cont);
 	return 0;
 }
