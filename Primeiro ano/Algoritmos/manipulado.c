@@ -30,7 +30,7 @@ int main()
 		printf("\nFavorecido %02d:\n>>> ", i + 1);
 		scanf("%d", &eleicao.numero[i][0]);
 	}
-    char margem;
+    	char margem;
 	printf("\nDeseja informar a margem de vitoria(s/n)?\nExemplo: candidato X ganhou 40%% dos votos.\n>>> ");
 	scanf(" %c", &margem);
 	double parcela;
@@ -65,9 +65,9 @@ void geraUrna(const int quantidade, const double vantagem, const candidatos * fa
 void mkFile(const int numero, char * arquivo, const char * extensao)
 {
 	char buffer[3];
-    itoa(numero, buffer, 10);
-    strcat(arquivo, buffer);
-    strcat(arquivo, extensao);
+	itoa(numero, buffer, 10);
+	strcat(arquivo, buffer);
+	strcat(arquivo, extensao);
 }
 
 double manipula(const int quantidade, candidatos * func_eleicao)
