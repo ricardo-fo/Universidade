@@ -7,73 +7,101 @@
 
 struct manipulacao{
 	int numero[15][2];/*numero e votos*/
-	double porcentagem[15];/*porcentagem de vitoria*/
+	float porcentagem[15];/*porcentagem de vitoria*/
 };
-typedef struct manipulacao candidatos;
-
+//typedef struct manipulacao candidatos;
+int voto[MAX];
 void mkFile(const int, char *, const char *);/*arg1 = valor a iterar, arg2 = nome do arquivo, arg3 = extensão do arquivo*/
-double manipula(const int, candidatos *);/*arg1 = quantidade de candidadtos, arg2 = registro dos dados dos candidatos*/
-void geraUrna(const int, const double, const candidatos *);/*arg1 = quantidade de candidatos, arg2 = parcela de vitoria, arg3 = dados dos favorecidos*/
+void manipula(const int, struct manipulacao *);/*arg1 = quantidade de candidadtos, arg2 = registro dos dados dos candidatos*/
+void geraUrna(const int, const float, const struct manipulacao *);/*arg1 = quantidade de candidatos, arg2 = parcela de vitoria, arg3 = dados dos favorecidos*/
 
 int main()
 {
-	int quantos, i;
-	printf("Digite quantos candidatos serao favorecidos:\n>>> ");
-	scanf("%d", &quantos);
-
+	int quantos = 1, i;
+	float parcela;
+	char margem;
+	typedef struct manipulacao candidatos;
 	candidatos eleicao;
 
-	printf("\nInforme o(s) numero(s) do(s) candidato(s) a ser(em) favorecido(s) em ordem de vitoria:\n");
+	printf("Digite quantos candidatos serao favorecidos:\n>>> ");
+	scanf("%d", &quantos);
+	while(quantos <= 0 || quantos >= 15){
+		printf("Valor invalido!\nInforme um valor na faixa de 0 a 15:\n>>> ");
+		scanf("%d", &quantos);
+		if(quantos == 0){return 0;}
+	}
+	printf("\nNAO REPITA CANDIDATOS!\nInforme o(s) numero(s) do(s) candidato(s) a ser(em) favorecido(s) em ordem de vitoria:\n");
 	for(i = 0; i < quantos; i++){
-        eleicao.numero[i][1] = 0;
-        eleicao.porcentagem[i] = (1.0/pow(3, i + 1)) * 100.0;/*porcentagem padrão*/
+        	eleicao.numero[i][1] = 0;
+        	eleicao.porcentagem[i] = (1.0/pow(3, i)) * 100;/*porcentagem padrão*/
 		printf("\nFavorecido %02d:\n>>> ", i + 1);
 		scanf("%d", &eleicao.numero[i][0]);
+		printf("eleicao.numero = %d\n", eleicao.numero[i][0]);
 	}
-    	char margem;
 	printf("\nDeseja informar a margem de vitoria(s/n)?\nExemplo: candidato X ganhou 40%% dos votos.\n>>> ");
 	scanf(" %c", &margem);
-	double parcela;
 
 	if(margem == 's' || margem == 'S')
-		parcela = manipula(quantos, &eleicao);
+		manipula(quantos, &eleicao);
+	//printf("porcentagem teste: %f\n", eleicao.porcentagem[1]);
+	printf("0 tá ok\n");
 	geraUrna(quantos, parcela, &eleicao);
 
 	return 0;
 }
 
-void geraUrna(const int quantidade, const double vantagem, const candidatos * favorecidos)
+void geraUrna(const int quantidade, const float vantagem, const struct manipulacao * favorecidos)
 {
+	int i, j, k, random, num[15] = {1, 2, 12, 13 ,15, 16, 17, 18, 19, 27, 30, 45, 50, 51, 54};
 	FILE * pin;
-	int i, urnas = 24 * ( (int) (ceil(vantagem / 100.0) )), cont, lim = 0, k;
-	for(i = 0; i < 1; i++){
-		lim = (int) ((*favorecidos).porcentagem[i] * MAX);
-		int voto[lim];
-		cont = 0;
-		for(k = 0; k < lim; k++){
-			voto[i] = (*favorecidos).numero[i][0];
-			cont++;
+	srand((unsigned)time(NULL));
+	for(i = 1; i < 25; i++){
+		char arquivo = "urna";
+		mkFile(i, arquivo, ".bin");
+		pin = fopen(arquivo, "wb");
+		for(j = 0; j < MAX; j++){
+			random = rand() % 15;
+			if(num[random] == favorecidos->numero[j][0]){
+				/*A FINALIZAR*/
+			}
 		}
-		/*char file[11] = "urna";
-		mkFile(j, file, ".bin");*/
-		pin = fopen("urna.bin", "wb");
-		fwrite(voto, sizeof(int), MAX, pin);
-		fclose(pin);
-		//(*favorecidos).numero[i][1] = cont;
 	}
+	/*for(j = 0; j < 15; j++){
+		if(j < quantidade){
+			for(k = 0; k < favorecidos->porcentagem[j]*10000; k++){
+				voto[k] = favorecidos->numero[j][0];
+			}
+			for(;k < (MAX - (favorecidos->porcentagem[j] * 10000)); k++){
+				random = rand() % 15;
+				voto[k] = num[random];
+			}
+			fwrite(voto, sizeof(int), MAX, pin);
+			//fclose(pin);
+		}else{
+			for(k = 0; k < MAX; k++){
+				random = rand() % 15;
+				voto[k] = num[random];
+			}
+			fwrite(voto, sizeof(int), MAX, pin);
+		}
+		printf("Jeitinho brasileiro em andamento. . .\n\n");
+	}
+	fclose(pin);*/
+	
 }
 void mkFile(const int numero, char * arquivo, const char * extensao)
 {
 	char buffer[3];
-	itoa(numero, buffer, 10);
-	strcat(arquivo, buffer);
-	strcat(arquivo, extensao);
+  	itoa(numero, buffer, 10);
+    	strcat(arquivo, buffer);
+    	strcat(arquivo, extensao);
 }
 
-double manipula(const int quantidade, candidatos * func_eleicao)
+void manipula(const int quantidade, struct manipulacao * func_eleicao)
 {
 	int i;
-	double receberao, total = 100, x;
+	double total = 100, x;
+	//float receberao = 0;
 	for(i = 0; i < quantidade; i++){
 		if(total <= 0){
 			printf("Voce usou todos os votos!\n");
@@ -89,9 +117,12 @@ double manipula(const int quantidade, candidatos * func_eleicao)
 			scanf("%lf", &x);
 			(*func_eleicao).porcentagem[i] = x;
 		}
-		total -= (*func_eleicao).porcentagem[i];
+		total -= ((*func_eleicao).porcentagem[i]);
 	}
-	printf("Deseja que seus candidatos recebam quantos porcento de todos os votos?\nDigite apenas o numero, sem sinal de %%:\n>>> ");
-	scanf("%lf", &receberao);
-	return receberao;
+	/*printf("Deseja que seus candidatos recebam quantos porcento de todos os votos?\nDigite apenas o numero, sem sinal de %%:\n>>> ");
+	scanf("%f", &receberao);
+	while(receberao <= 0 || receberao >= 100){
+		printf("Valor negativo ou excedente a 100!\nInforme um valor na faixa de 0 a 100:\n>>> ");
+		scanf("%f", &receberao);
+	}*/
 }
