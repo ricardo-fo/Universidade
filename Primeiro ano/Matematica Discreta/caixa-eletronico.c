@@ -1,9 +1,4 @@
 /*
-TRABALHO DE MATEMÁTICA DISCRETA II
-	
-Nome: Ricardo de Freitas Oliveira.
-Curso: Ciência da Computação.
-	
 Criar um caixa eletrônico para sacar um dinheiro informado pelo usuário.
 Após o scan do valor à sacar, o usuário deve escolher 2 cédulas diferentes
 (2,5,10,20,50 ou 100). Output: A menor quantidade de cédulas para sacar o
@@ -35,32 +30,37 @@ bool menu(double * quantia, double * nota1, double * nota2)
 	recebe 3 argumentos do tipo ponteiro de double e modifica eles na main();
 	*/
 	double valor, n1, n2;
-	printf("Bem-vindo(a) ao Caixa Eletronico.\n\n");
-	printf("Atalhos:\nDigitar uma quantia <= 0 finaliza o programa!\n");
-	printf("\nInforme a quantia que deseja sacar:\n>>> R$ ");
+	printf("************************************************\n");
+	printf("*       Bem-vindo(a) ao Caixa Eletronico       *\n");
+	printf("*----------------------------------------------*\n");
+	printf("*  Atalhos:                                    *\n");
+	printf("*  Digite uma quantia <= 0 finaliza o programa *\n");
+	printf("************************************************\n");
+	printf("Informe a quantia que deseja sacar:\n>>> R$ ");
 	scanf("%lf", &valor);
 	if(valor <= 0){return false;}
 	while((valor > abs(valor) && valor < (abs(valor) + 1)) || valor < 0){
-		printf("\n!!! - Informe apenas quantias inteiras positivas:\n>>> R$ ");
+		printf("\n\aInforme apenas quantias inteiras positivas:\n>>> R$ ");
 		scanf("%lf", &valor);
 	}
 
-	printf("\nInforme as duas notas que deseja sacar:\nCedulas validas - 2, 5, 10, 20, 50, 100:\n\nNota 1 - >>> R$ ");
+	printf("\nCedulas validas: 2, 5, 10, 20, 50, 100\nInforme as duas notas que deseja sacar:\nNota 1 >>> R$ ");
 	scanf("%lf", &n1);
 	while(!valido(n1)){
-		printf("\n!!! - Informe apenas notas validas:\n1 - >>> R$ ");
+		printf("\n\aNOTA NAO ENCONTRADA!\nInforme apenas notas validas:\nNota 1 >>> R$ ");
 		scanf("%lf", &n1);
 	}
 
-	printf("Nota 2 - >>> R$ ");
+	printf("Nota 2 >>> R$ ");
 	scanf("%lf", &n2);
 	while(!valido(n2)){
-		printf("\n!!! - Informe apenas notas validas:\n2 - >>> R$ ");
+		printf("\n\aNOTA NAO ENCONTRADA!\nInforme apenas notas validas:\nNota 2 >>> R$ ");
 		scanf("%lf", &n2);
 	}
 	*quantia = valor;
 	*nota1 = n1;
 	*nota2 = n2;
+	return true;
 }
 
 bool valido(double verificar)
