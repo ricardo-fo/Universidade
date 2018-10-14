@@ -1,4 +1,9 @@
 /*
+TRABALHO DE MATEMÁTICA DISCRETA II
+	
+Nome: Ricardo de Freitas Oliveira.
+Curso: Ciência da Computação.
+	
 Criar um caixa eletrônico para sacar um dinheiro informado pelo usuário.
 Após o scan do valor à sacar, o usuário deve escolher 2 cédulas diferentes
 (2,5,10,20,50 ou 100). Output: A menor quantidade de cédulas para sacar o
@@ -10,7 +15,7 @@ valor. Obs: É obrigatório conter as duas cédulas no output.
 
 bool menu(double *, double *, double *);/*menu de controle*/
 int quantas(double, double, double);/*informa quantas notas serão usadas*/
-bool valido(double);/*verifica se a cédula informada é váldia*/
+bool valido(double);/*verifica se a cédula informada é válida*/
 
 int main()
 {
@@ -47,7 +52,7 @@ bool menu(double * quantia, double * nota1, double * nota2)
 		scanf("%lf", &n1);
 	}
 
-	printf("\nNota 2 - >>> R$ ");
+	printf("Nota 2 - >>> R$ ");
 	scanf("%lf", &n2);
 	while(!valido(n2)){
 		printf("\n!!! - Informe apenas notas validas:\n2 - >>> R$ ");
