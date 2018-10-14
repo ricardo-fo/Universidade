@@ -14,10 +14,10 @@ bool valido(double);/*verifica se a cédula informada é válida*/
 
 int main()
 {
-	double valor, n1, n2;
+	double saque, ced1, ced2;
 
-	while(menu(&valor, &n1, &n2)){
-		quantas(valor, n1, n2);
+	while(menu(&saque, &ced1, &ced2)){
+		quantas(saque, ced1, ced2);
 	}
 
 	return 0;
