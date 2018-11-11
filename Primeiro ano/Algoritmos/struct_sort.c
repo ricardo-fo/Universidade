@@ -63,7 +63,6 @@ void fillRandomic(banda bandas[FIVE])
 						    {1, 1, 1, 4, 4},
 						    {1, 2, 3, 4, 5}};
 	int i, j;
-
 	swap(storage);
 
 	for(i = 0; i < FIVE; i++){
