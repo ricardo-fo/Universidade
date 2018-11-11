@@ -3,7 +3,6 @@
 #include <string.h> //strings
 #include <stdlib.h> //srand and rand
 #include <ctype.h>	//tolower
-
 #define FIVE 5
 
 struct sbanda{
