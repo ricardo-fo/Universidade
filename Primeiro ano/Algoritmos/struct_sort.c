@@ -1,8 +1,13 @@
+/*
+TRABALHO DE ALGORITMOS
+AUTOR: RICARDO DE FREITAS
+UNISANTOS - 11/11/2018
+*/
 #include <stdio.h>  //padrão
 #include <time.h>   //time_t
 #include <string.h> //strings
 #include <stdlib.h> //srand and rand
-#include <ctype.h>	//tolower
+#include <ctype.h>  //tolower
 #define FIVE 5
 
 struct sbanda{
@@ -22,6 +27,8 @@ int checkInt(int, banda bandas[FIVE]);
 void findRank(void);
 void findSong(void);
 void findBand(void);
+void menu(banda bandas[FIVE]);
+void showAll(banda bandas[FIVE]);
 
 int main()
 {
@@ -30,6 +37,8 @@ int main()
 	banda bandas[FIVE];
 
 	srand((unsigned)time(&t));
+	menu(bandas);
+	/*
 	fillRandomic(bandas);
 	//fillUser(bandas);
 	sort(bandas);
@@ -46,9 +55,76 @@ int main()
 	if(mkBin(bandas)){
 		fprintf(stderr, "\nHouveram problemas ao manipular o arquivo binario!\n");
 		return 1;
-	}
-
+	}*/
 	return 0;
+}
+
+void menu(banda bandas[FIVE])
+{
+	int choice, choice2;
+	printf("--------------------------------------------------\n\t\tBEM-VINDO(A)\n--------------------------------------------------\n");
+	do{
+		printf("1 - Preencher estrutura automaticamente;\n2 - Preencher estrutura manualmente;\n0 - Sair.\n>>> ");
+		scanf("%d", &choice);
+		switch(choice){
+			case 1:
+				fillRandomic(bandas);
+				sort(bandas);
+				if(mkBin(bandas)){
+					fprintf(stderr, "\nHouveram problemas ao manipular o arquivo binario!\n");
+					exit(1);
+				}
+				do{
+					printf("\n3 - Achar pelo ranking;\n4 - Achar pelo estilo de musica;\n5 - Achar pelo nome da banda;\n0 - Sair.\n>>> ");
+					scanf("%d", &choice2);
+					switch(choice2){
+						case 3:
+							findRank();
+							break;
+						case 4:
+							findSong();
+							break;
+						case 5:
+							findBand();
+							break;
+						case 0:
+							printf("\n. . .\n");
+							break;
+					}
+				}while(choice2 != 0);
+				break;
+			case 2:
+				fillUser(bandas);
+				sort(bandas);
+				if(mkBin(bandas)){
+					fprintf(stderr, "\nHouveram problemas ao manipular o arquivo binario!\n");
+					exit(1);
+				}
+				do{
+					printf("\n3 - Achar pelo ranking;\n4 - Achar pelo estilo de musica;\n5 - Achar pelo nome da banda;\n0 - Sair.\n>>> ");
+					scanf("%d", &choice2);
+					switch(choice2){
+						case 3:
+							findRank();
+							break;
+						case 4:
+							findSong();
+							break;
+						case 5:
+							findBand();
+							break;
+						case 0:
+							printf("\n. . .\n");
+							break;
+					}
+				}while(choice2 != 0);
+				break;
+			case 0:
+				printf("\nBye :)\n");
+				break;
+		}
+	}while(choice != 0);
+	exit(0);
 }
 
 void fillRandomic(banda bandas[FIVE])
@@ -63,8 +139,8 @@ void fillRandomic(banda bandas[FIVE])
 						    {1, 1, 1, 4, 4},
 						    {1, 2, 3, 4, 5}};
 	int i, j;
-	swap(storage);
 
+	swap(storage);
 	for(i = 0; i < FIVE; i++){
 		strcpy(bandas[i].name, list_names[storage[0][i]]);
 		if(strlen(list_songs[storage[1][i]]) == 0){
