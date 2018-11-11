@@ -3,11 +3,13 @@ TRABALHO DE ALGORITMOS
 AUTOR: RICARDO DE FREITAS
 UNISANTOS - 11/11/2018
 */
+
 #include <stdio.h>  //padrão
 #include <time.h>   //time_t
 #include <string.h> //strings
 #include <stdlib.h> //srand and rand
-#include <ctype.h>  //tolower
+#include <ctype.h>	//tolower
+
 #define FIVE 5
 
 struct sbanda{
@@ -38,24 +40,7 @@ int main()
 
 	srand((unsigned)time(&t));
 	menu(bandas);
-	/*
-	fillRandomic(bandas);
-	//fillUser(bandas);
-	sort(bandas);
-	findRank();
-	findSong();
-	findBand();
-	for(i = 0; i < FIVE; i++){
-		printf("Nome: %s\n", bandas[i].name);
-		printf("Musica: %s\n", bandas[i].song);
-		printf("Membro(s): %d\n", bandas[i].members);
-		printf("Ranking: %do\n\n", bandas[i].ranking);
-	}
 
-	if(mkBin(bandas)){
-		fprintf(stderr, "\nHouveram problemas ao manipular o arquivo binario!\n");
-		return 1;
-	}*/
 	return 0;
 }
 
@@ -75,7 +60,7 @@ void menu(banda bandas[FIVE])
 					exit(1);
 				}
 				do{
-					printf("\n3 - Achar pelo ranking;\n4 - Achar pelo estilo de musica;\n5 - Achar pelo nome da banda;\n0 - Sair.\n>>> ");
+					printf("\n3 - Achar pelo ranking;\n4 - Achar pelo estilo de musica;\n5 - Achar pelo nome da banda;\n6 - Mostrar tudo;\n0 - Retornar.\n>>> ");
 					scanf("%d", &choice2);
 					switch(choice2){
 						case 3:
@@ -87,10 +72,17 @@ void menu(banda bandas[FIVE])
 						case 5:
 							findBand();
 							break;
+						case 6:
+							showAll(bandas);
+							break;
 						case 0:
 							printf("\n. . .\n");
 							break;
+						default:
+							fprintf(stderr, "\nOops! Algo deu errado!\n");
+							break;
 					}
+
 				}while(choice2 != 0);
 				break;
 			case 2:
@@ -101,7 +93,7 @@ void menu(banda bandas[FIVE])
 					exit(1);
 				}
 				do{
-					printf("\n3 - Achar pelo ranking;\n4 - Achar pelo estilo de musica;\n5 - Achar pelo nome da banda;\n0 - Sair.\n>>> ");
+					printf("\n3 - Achar pelo ranking;\n4 - Achar pelo estilo de musica;\n5 - Achar pelo nome da banda;\n6 - Mostrar tudo;\n0 - Retornar.\n>>> ");
 					scanf("%d", &choice2);
 					switch(choice2){
 						case 3:
@@ -113,15 +105,24 @@ void menu(banda bandas[FIVE])
 						case 5:
 							findBand();
 							break;
+						case 6:
+							showAll(bandas);
+							break;
 						case 0:
 							printf("\n. . .\n");
 							break;
+						default:
+							fprintf(stderr, "\nOops! Algo deu errado!\n");
+							break;
 					}
+
 				}while(choice2 != 0);
 				break;
 			case 0:
 				printf("\nBye :)\n");
 				break;
+			default:
+				fprintf(stderr, "\nOpps! Algo deu errado!\n");
 		}
 	}while(choice != 0);
 	exit(0);
@@ -131,16 +132,17 @@ void fillRandomic(banda bandas[FIVE])
 {
 	/*This function fill out the struct randomly to save time*/
 	char list_names[FIVE][51] = {"the beatles", "pink floyd", "chet baker",
-							     "tchaikovsky", "zeca pagodinho"};
+				"tchaikovsky", "zeca pagodinho"};
 	char list_songs[FIVE][21] = {"rock", "psicodelico", "jazz", "classico",
-					   		     "pagode"};
+				"pagode"};
 	int storage[4][FIVE] = {{0, 1, 2, 3, 4},
-						    {0, 1, 2, 3, 4},
-						    {1, 1, 1, 4, 4},
-						    {1, 2, 3, 4, 5}};
+				{0, 1, 2, 3, 4},
+				{1, 1, 1, 4, 4},
+				{1, 2, 3, 4, 5}};
 	int i, j;
 
 	swap(storage);
+
 	for(i = 0; i < FIVE; i++){
 		strcpy(bandas[i].name, list_names[storage[0][i]]);
 		if(strlen(list_songs[storage[1][i]]) == 0){
@@ -176,15 +178,15 @@ void fillUser(banda bandas[FIVE])
 	char nome[101], musica[101], r;
 	int membros, rank;
 
-	printf("Preencha as estruturas com informacoes sobre bandas:\n");
+	printf("Preencha as estruturas com informacoes sobre bandas:");
 	for(i = 0; i < 5; i++){
-		printf("\nNome da banda 0%d >>> ", i+1);
+		printf("\n\nNome da banda 0%d >>> ", i+1);
 		scanf(" %[^\n]s", nome);
 		for(j = 0; j < strlen(nome); j++){
 			nome[j] = tolower(nome[j]);
 		}
 		while(checkStr(nome, bandas)){
-			fprintf(stderr, "\nEssa banda ja foi adicionada!\nEscolha outro nome para a banda 0%d >>> ", i);
+			fprintf(stderr, "\nEssa banda ja foi adicionada!\nEscolha outro nome para a banda 0%d >>> ", i+1);
 			scanf(" %[^\n]s", nome);
 		}	
 		strcpy(bandas[i].name, nome);
@@ -371,4 +373,15 @@ void findBand()
 		printf("\nNao esta' entre minhas bandas favoritas!\n");
 	fclose(PB_OUT);
 }
-/*END OF FILE*/
+
+void showAll(banda * bandas)
+{
+	register int i;
+
+	for(i = 0; i < FIVE; i++){
+		printf("\nNome: %s\n", bandas[i].name);
+		printf("Musica: %s\n", bandas[i].song);
+		printf("Membro(s): %d\n", bandas[i].members);
+		printf("Ranking: %do", bandas[i].ranking);
+	}
+}
