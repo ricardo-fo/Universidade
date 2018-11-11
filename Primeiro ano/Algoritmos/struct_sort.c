@@ -1,7 +1,6 @@
-/*
-TRABALHO DE ALGORITMOS
+/*TRABALHO DE ALGORITMOS - UNISANTOS - 2018
 AUTOR: RICARDO DE FREITAS
-UNISANTOS - 11/11/2018
+ESTE PROGRAMA PREENCHE UMA LISTA COM 5 BANDAS E SUAS INFORMAÇÕES
 */
 
 #include <stdio.h>  //padrão
@@ -9,7 +8,6 @@ UNISANTOS - 11/11/2018
 #include <string.h> //strings
 #include <stdlib.h> //srand and rand
 #include <ctype.h>	//tolower
-
 #define FIVE 5
 
 struct sbanda{
@@ -23,6 +21,7 @@ int mkBin(banda bandas[FIVE]);
 void fillUser(banda bandas[FIVE]);
 void fillRandomic(banda bandas[FIVE]);
 void sort(banda bandas[FIVE]);
+void Reset(banda bandas[FIVE]);
 void sortMember(banda * one, banda * two);
 int checkStr(const char *, banda bandas[FIVE]);
 int checkInt(int, banda bandas[FIVE]);
@@ -86,6 +85,7 @@ void menu(banda bandas[FIVE])
 				}while(choice2 != 0);
 				break;
 			case 2:
+				Reset(bandas);
 				fillUser(bandas);
 				sort(bandas);
 				if(mkBin(bandas)){
@@ -132,9 +132,9 @@ void fillRandomic(banda bandas[FIVE])
 {
 	/*This function fill out the struct randomly to save time*/
 	char list_names[FIVE][51] = {"the beatles", "pink floyd", "chet baker",
-				"tchaikovsky", "zeca pagodinho"};
+				     "tchaikovsky", "zeca pagodinho"};
 	char list_songs[FIVE][21] = {"rock", "psicodelico", "jazz", "classico",
-				"pagode"};
+				     "pagode"};
 	int storage[4][FIVE] = {{0, 1, 2, 3, 4},
 				{0, 1, 2, 3, 4},
 				{1, 1, 1, 4, 4},
@@ -188,7 +188,7 @@ void fillUser(banda bandas[FIVE])
 		while(checkStr(nome, bandas)){
 			fprintf(stderr, "\nEssa banda ja foi adicionada!\nEscolha outro nome para a banda 0%d >>> ", i+1);
 			scanf(" %[^\n]s", nome);
-		}	
+		}
 		strcpy(bandas[i].name, nome);
 
 		printf("\nTipo de musica da banda 0%d >>> ", i+1);
@@ -209,6 +209,18 @@ void fillUser(banda bandas[FIVE])
 			scanf("%d", &rank);
 		}
 		bandas[i].ranking = rank;
+	}
+}
+
+void Reset(banda bandas[FIVE])
+{
+	register int i;
+
+	for(i = 0; i < FIVE; i++){
+		strcpy(bandas[i].name, "");
+		strcpy(bandas[i].song, "");
+		bandas[i].members = 0;
+		bandas[i].ranking = 0;
 	}
 }
 
@@ -303,7 +315,7 @@ void findRank()
 		exit(1);
 	}
 	for(i = 0; i < FIVE; i++){
-		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT); 
+		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
 		if(read[i].ranking == number){
 			printf("\nNome: %s\nMusica: %s\nMembro(s): %d\nRanking: %do\n\n", read[i].name, read[i].song, read[i].members, read[i].ranking);
 			a = 0;
@@ -334,7 +346,7 @@ void findSong()
 		exit(1);
 	}
 	for(i = 0; i < FIVE; i++){
-		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT); 
+		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
 		if(!strcmp(read[i].song, nome)){
 			printf("\nNome: %s\nMusica: %s\nMembro(s): %d\nRanking: %do\n\n", read[i].name, read[i].song, read[i].members, read[i].ranking);
 			a = 0;
@@ -363,7 +375,7 @@ void findBand()
 		exit(1);
 	}
 	for(i = 0; i < FIVE; i++){
-		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT); 
+		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
 		if(!strcmp(read[i].name, band)){
 			printf("Sim, eu gosto de %s\n", read[i].name);
 			a = 0;
@@ -382,6 +394,6 @@ void showAll(banda * bandas)
 		printf("\nNome: %s\n", bandas[i].name);
 		printf("Musica: %s\n", bandas[i].song);
 		printf("Membro(s): %d\n", bandas[i].members);
-		printf("Ranking: %do", bandas[i].ranking);
+		printf("Ranking: %do\n", bandas[i].ranking);
 	}
 }
