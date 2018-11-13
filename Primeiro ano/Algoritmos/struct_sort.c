@@ -6,7 +6,7 @@ ESTE PROGRAMA PREENCHE UMA LISTA COM 5 BANDAS E SUAS INFORMAÇÕES
 #include <time.h>   //time_t
 #include <string.h> //strings
 #include <stdlib.h> //srand and rand
-#include <ctype.h>	//tolower
+#include <ctype.h>  //tolower
 
 #define FIVE 5
 
