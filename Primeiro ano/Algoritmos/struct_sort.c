@@ -2,12 +2,12 @@
 AUTOR: RICARDO DE FREITAS
 ESTE PROGRAMA PREENCHE UMA LISTA COM 5 BANDAS E SUAS INFORMAÇÕES
 */
-
 #include <stdio.h>  //padrão
 #include <time.h>   //time_t
 #include <string.h> //strings
 #include <stdlib.h> //srand and rand
 #include <ctype.h>	//tolower
+
 #define FIVE 5
 
 struct sbanda{
@@ -21,7 +21,7 @@ int mkBin(banda bandas[FIVE]);
 void fillUser(banda bandas[FIVE]);
 void fillRandomic(banda bandas[FIVE]);
 void sort(banda bandas[FIVE]);
-void Reset(banda bandas[FIVE]);
+void reset(banda bandas[FIVE]);
 void sortMember(banda * one, banda * two);
 int checkStr(const char *, banda bandas[FIVE]);
 int checkInt(int, banda bandas[FIVE]);
@@ -29,7 +29,7 @@ void findRank(void);
 void findSong(void);
 void findBand(void);
 void menu(banda bandas[FIVE]);
-void showAll(banda bandas[FIVE]);
+void showAll(const banda bandas[FIVE]);
 
 int main()
 {
@@ -85,7 +85,7 @@ void menu(banda bandas[FIVE])
 				}while(choice2 != 0);
 				break;
 			case 2:
-				Reset(bandas);
+				reset(bandas);
 				fillUser(bandas);
 				sort(bandas);
 				if(mkBin(bandas)){
@@ -160,7 +160,7 @@ void swap(int vet[][FIVE])
 	/*THIS FUNCTION CHANGE THE ORIGINAL ARRAY TO MAKE A RANDOMIC ARRAY*/
 	register int i, j, rnd1, rnd2, aux;
 
-	for(i = 0; i < 4; i++){
+	for(i = 0; i < 10; i++){
 		for(j = 0; j < FIVE; j++){
 			rnd1 = rand() % FIVE;
 			rnd2 = rand() % FIVE;
@@ -178,9 +178,9 @@ void fillUser(banda bandas[FIVE])
 	char nome[101], musica[101], r;
 	int membros, rank;
 
-	printf("Preencha as estruturas com informacoes sobre bandas:");
+	printf("\nPreencha as estruturas com informacoes sobre bandas:");
 	for(i = 0; i < 5; i++){
-		printf("\n\nNome da banda 0%d >>> ", i+1);
+		printf("\nNome 0%d: ", i+1);
 		scanf(" %[^\n]s", nome);
 		for(j = 0; j < strlen(nome); j++){
 			nome[j] = tolower(nome[j]);
@@ -191,18 +191,18 @@ void fillUser(banda bandas[FIVE])
 		}
 		strcpy(bandas[i].name, nome);
 
-		printf("\nTipo de musica da banda 0%d >>> ", i+1);
+		printf("Musica 0%d: ", i+1);
 		scanf(" %[^\n]s", musica);
 		for(j = 0; j < strlen(musica); j++){
 			musica[j] = tolower(musica[j]);
 		}
 		strcpy(bandas[i].song, musica);
 
-		printf("\nQuantidade de membros da banda 0%d >>> ", i+1);
+		printf("Membros 0%d: ", i+1);
 		scanf("%d", &membros);
 		bandas[i].members = membros;
 
-		printf("\nPosicao do ranking da banda 0%d >>> ", i+1);
+		printf("Ranking 0%d: ", i+1);
 		scanf("%d", &rank);
 		while(checkInt(rank, bandas) || rank < 1 || rank > 5){
 			fprintf(stderr, "\nOops!\nEscolha outra posicao para a banda 0%d >>> ", i+1);
@@ -212,7 +212,7 @@ void fillUser(banda bandas[FIVE])
 	}
 }
 
-void Reset(banda bandas[FIVE])
+void reset(banda bandas[FIVE])
 {
 	register int i;
 
@@ -262,24 +262,11 @@ void sort(banda bandas[FIVE])
 void sortMember(banda * one, banda * two)
 {
 	/*THIS FUNCTION CHANGES STRUCT LINES*/
-	char str[strlen(one->name)];
-	register int aux;
+	banda aux;
 
-	strcpy(str, one->name);
-	strcpy(one->name, two->name);
-	strcpy(two->name, str);
-
-	strcpy(str, one->song);
-	strcpy(one->song, two->song);
-	strcpy(two->song, str);
-
-	aux = one->members;
-	one->members = two->members;
-	two->members = aux;
-
-	aux = one->ranking;
-	one->ranking = two->ranking;
-	two->ranking = aux;
+	aux = *one;
+	*one = *two;
+	*two = aux;
 }
 
 int mkBin(banda bandas[FIVE])
@@ -312,7 +299,7 @@ void findRank()
 	}
 	if((PB_OUT = fopen("storage_bands.bin","rb")) == NULL){
 		fprintf(stderr, "\nHouveram problemas ao manipular o arquivo binario!\n");
-		exit(1);
+		return;
 	}
 	for(i = 0; i < FIVE; i++){
 		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
@@ -324,7 +311,6 @@ void findRank()
 	}
 	if(a)
 		printf("\nNao encontrado!\n");
-
 	fclose(PB_OUT);
 }
 
@@ -343,7 +329,7 @@ void findSong()
 	}
 	if((PB_OUT = fopen("storage_bands.bin","rb")) == NULL){
 		fprintf(stderr, "\nHouveram problemas ao manipular o arquivo binario!\n");
-		exit(1);
+		return;
 	}
 	for(i = 0; i < FIVE; i++){
 		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
@@ -372,7 +358,7 @@ void findBand()
 	}
 	if((PB_OUT = fopen("storage_bands.bin","rb")) == NULL){
 		fprintf(stderr, "\nHouveram problemas ao manipular o arquivo binario!\n");
-		exit(1);
+		return;
 	}
 	for(i = 0; i < FIVE; i++){
 		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
@@ -386,7 +372,7 @@ void findBand()
 	fclose(PB_OUT);
 }
 
-void showAll(banda * bandas)
+void showAll(const banda bandas[FIVE])
 {
 	register int i;
 
