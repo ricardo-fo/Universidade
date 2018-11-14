@@ -1,39 +1,38 @@
-/*TRABALHO DE ALGORITMOS - II *
-* Autor: Ricardo de Freitas   *
-* 13/11/2018		      */
+/*
+Autor: Ricardo de F. Oliveira - Ciência da Computação - UNISANTOS
+Algoritmos II - 2018
+*/
+
 #include <stdio.h>  //padrão
 #include <time.h>   //time_t
 #include <string.h> //strings
 #include <stdlib.h> //srand and rand
-#include <ctype.h>	//tolower
+#include <ctype.h>  //tolower
 
-struct sbanda{
+typedef struct {
 	char name[101];
 	char song[101];
 	int members;
 	int ranking;
-};
+} banda;
 
-typedef struct sbanda banda;
-
+void menu(banda *);
+void mkBin(banda *);
 void swap(int vet[][5]);
-void mkBin(banda bandas[5]);
-void fillUser(banda bandas[5]);
-void fillRandomic(banda bandas[5]);
-void sort(banda bandas[5]);
-void reset(banda bandas[5]);
-int checkStr(const char *, banda bandas[5]);
-int checkInt(int, banda bandas[5]);
+void fillUser(banda *);
+void fillRandomic(banda *);
+void sort(banda *);
+void reset(banda *);
 void findRank(void);
 void findSong(void);
 void findBand(void);
-void menu(banda bandas[5]);
-void showAll(const banda bandas[5]);
+void showAll(const banda *);
+int checkInt(int, banda *);
+int checkStr(const char *, banda *);
 
 int main()
 {
 	time_t t;
-	register int i;
 	banda bandas[5];
 
 	srand((unsigned)time(&t));
@@ -42,7 +41,7 @@ int main()
 	return 0;
 }
 
-void menu(banda bandas[5])
+void menu(banda * bandas)
 {
 	int choice, choice2;
 	printf("--------------------------------------------------\n");
@@ -57,16 +56,13 @@ void menu(banda bandas[5])
 		switch(choice){
 			case 1:
 				fillRandomic(bandas);
-				sort(bandas);
-				mkBin(bandas);
 				break;
 			case 2:
-				reset(bandas);
 				fillUser(bandas);
-				sort(bandas);
-				mkBin(bandas);
 				break;
 			case 3:
+				sort(bandas);
+				mkBin(bandas);
 				do{
 					printf("\n4 - Achar pelo ranking;\n");
 					printf("5 - Achar pelo estilo de musica;\n");
@@ -104,10 +100,9 @@ void menu(banda bandas[5])
 				break;
 		}
 	}while(choice != 0);
-	return;
 }
 
-void fillRandomic(banda bandas[5])
+void fillRandomic(banda * bandas)
 {
 	/*This function fill out the struct randomly to save time*/
 	char list_names[5][51] = {"the beatles", "pink floyd", "chet baker",
@@ -138,7 +133,7 @@ void swap(int vet[][5])
 	/*THIS FUNCTION CHANGE THE ORIGINAL ARRAY TO MAKE A RANDOMIC ARRAY*/
 	register int i, j, rnd1, rnd2, aux;
 
-	for(i = 0; i < 10; i++){
+	for(i = 0; i < 20; i++){
 		for(j = 0; j < 5; j++){
 			rnd1 = rand() % 5;
 			rnd2 = rand() % 5;
@@ -149,12 +144,14 @@ void swap(int vet[][5])
 	}
 }
 
-void fillUser(banda bandas[5])
+void fillUser(banda * bandas)
 {
 	/*THIS FUNCTION MAKE A STRUCT BY THE USER WAY*/
 	register int i, j;
-	char nome[101], musica[101], r;
+	char nome[101], musica[101];
 	int membros, rank;
+
+	reset(bandas);
 
 	printf("\nPreencha as estruturas com informacoes sobre bandas:");
 	for(i = 0; i < 5; i++){
@@ -190,7 +187,7 @@ void fillUser(banda bandas[5])
 	}
 }
 
-void reset(banda bandas[5])
+void reset(banda * bandas)
 {
 	register int i;
 
@@ -202,7 +199,7 @@ void reset(banda bandas[5])
 	}
 }
 
-int checkStr(const char * nome, banda bandas[5])
+int checkStr(const char * nome, banda * bandas)
 {
 	/*THIS FUNCTION CHECKS IF A BAND NAME THERE IS IN YOUR STRUCT*/
 	register int i;
@@ -213,7 +210,7 @@ int checkStr(const char * nome, banda bandas[5])
 	return 0;
 }
 
-int checkInt(int rank, banda bandas[5])
+int checkInt(int rank, banda * bandas)
 {
 	/*THIS FUNCTION CHECKS IF A BAND RANKING THERE IS IN YOUR STRUCT*/
 	register int i;
@@ -224,7 +221,7 @@ int checkInt(int rank, banda bandas[5])
 	return 0;
 }
 
-void sort(banda bandas[5])
+void sort(banda * bandas)
 {
 	/*THIS FUNCTION SORTS THE STRUCT BY THE RANKING ORDER*/
 	register int i, j;
@@ -241,7 +238,7 @@ void sort(banda bandas[5])
 	}
 }
 
-void mkBin(banda bandas[5])
+void mkBin(banda * bandas)
 {
 	/*THIS FUNCTION CREATE THE BINARY FILE TO STORAGE ALL INFORMATIONS*/
 	register int i;
@@ -261,7 +258,7 @@ void mkBin(banda bandas[5])
 void findRank()
 {
 	/*THIS FUNCTION SEARCH WHETER A BAND'S RANKING EXISTS*/
-	struct sbanda read[5];
+	banda read[5];
 	int number = 1, i, a = 1;
 	FILE * PB_OUT;
 
@@ -276,7 +273,7 @@ void findRank()
 		return;
 	}
 	for(i = 0; i < 5; i++){
-		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
+		fread(&read[i], sizeof(banda), 1, PB_OUT);
 		if(read[i].ranking == number){
 			printf("\nNome: %s\nMusica: %s\nMembro(s): %d\nRanking: %do\n\n", read[i].name, read[i].song, read[i].members, read[i].ranking);
 			a = 0;
@@ -291,7 +288,7 @@ void findRank()
 void findSong()
 {
 	/*THIS FUNCTION SEARCH WHETER A BAND'S SONG EXISTS*/
-	struct sbanda read[5];
+	banda read[5];
 	int i, a = 1;
 	char nome[101];
 	FILE * PB_OUT;
@@ -306,7 +303,7 @@ void findSong()
 		return;
 	}
 	for(i = 0; i < 5; i++){
-		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
+		fread(&read[i], sizeof(banda), 1, PB_OUT);
 		if(!strcmp(read[i].song, nome)){
 			printf("\nNome: %s\nMusica: %s\nMembro(s): %d\nRanking: %do\n\n", read[i].name, read[i].song, read[i].members, read[i].ranking);
 			a = 0;
@@ -320,7 +317,7 @@ void findSong()
 void findBand()
 {
 	/*THIS FUNCTION SEARCH WHETER A BAND THERE IS IN MY FAVORITE LIST*/
-	struct sbanda read[5];
+	banda read[5];
 	int i, a = 1;
 	char band[101];
 	FILE * PB_OUT;
@@ -335,7 +332,7 @@ void findBand()
 		return;
 	}
 	for(i = 0; i < 5; i++){
-		fread(&read[i], sizeof(struct sbanda), 1, PB_OUT);
+		fread(&read[i], sizeof(banda), 1, PB_OUT);
 		if(!strcmp(read[i].name, band)){
 			printf("Sim, eu gosto de %s\n", read[i].name);
 			a = 0;
@@ -346,7 +343,7 @@ void findBand()
 	fclose(PB_OUT);
 }
 
-void showAll(const banda bandas[5])
+void showAll(const banda * bandas)
 {
 	register int i;
 
