@@ -73,23 +73,23 @@ void PreencheAuto()
 					" de Souza", " Heinsenberg", " Gilmour", " Macedo",
 					" Trindade", " di Pinto"};
     	char lista_ultimo_nome[10][15] = {" Vasconcelos", " Visconde", " Barbosa", " Nascimento",
-                                      " Pedreira", " Rocha", " Marconde", " de Rosa",
-                                      " D'Avila", " Flores"};
+                                      	  " Pedreira", " Rocha", " Marconde", " de Rosa",
+                                      	  " D'Avila", " Flores"};
 	char lista_nome_sobrenome[MAX][41];
 	int storage_str[3][10] = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 				  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 				  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
-    int lista_numeros[MAX];
-    int lista_areas[MAX];
-    int lista_moradores[MAX];
-    float lista_valores[MAX];
+	int lista_numeros[MAX];
+	int lista_areas[MAX];
+	int lista_moradores[MAX];
+	float lista_valores[MAX];
 	register int i;
 	register float j;
 
 	TrocaStr(storage_str);
 	CriaNome(lista_nome_sobrenome, lista_nome, lista_sobrenome, lista_ultimo_nome, storage_str);
-    Numero(2, 1, lista_numeros);
-    Numero(70, 5, lista_areas);
+	Numero(2, 1, lista_numeros);
+	Numero(70, 5, lista_areas);
 
 	for(i = 0; i < MAX; i++){
 		strcpy(lares[i].nome, lista_nome_sobrenome[i]);
@@ -121,9 +121,9 @@ void Numero(int inicio, int operacao, int * vet)
 {
 	register int i, j, rnd1, rnd2, aux;
 
-    for(i = inicio, j = 0; j < MAX; i += operacao, j++){
+	for(i = inicio, j = 0; j < MAX; i += operacao, j++){
 		vet[j] = i;
-    }
+	}
 	for(i = 0; i < MAX; i++){
 		rnd1 = rand() % MAX;
 		rnd2 = rand() % MAX;
@@ -141,18 +141,18 @@ void CriaNome(char pessoas[MAX][41], const char nomes[10][15], const char sobren
 		for(j = 0; j < 4; j++){
 			strcpy(pessoas[sum], nomes[vet[0][i]]);
 			if(j % 2 == 0){
-                rnd1 = rand () % 10;
-                rnd2 = rand() % 10;
-                strcat(pessoas[sum], sobrenomes[vet[1][rnd1]]);
-                strcat(pessoas[sum], ultimo[vet[2][rnd2]]);
-                sum++;
-                continue;
+                		rnd1 = rand () % 10;
+                		rnd2 = rand() % 10;
+                		strcat(pessoas[sum], sobrenomes[vet[1][rnd1]]);
+                		strcat(pessoas[sum], ultimo[vet[2][rnd2]]);
+                		sum++;
+               			continue;
 			}
 			rnd1 = rand () % 10;
 			rnd2 = rand() % 10;
 			strcat(pessoas[sum], ultimo[vet[2][rnd2]]);
 			strcat(pessoas[sum], sobrenomes[vet[1][rnd1]]);
-            sum++;
+           		sum++;
 		}
 	}
 }
