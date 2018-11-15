@@ -68,17 +68,17 @@ void Menu()
 void PreencheAuto()
 {
 	char lista_nome[10][15] = {"Ana", "Beatriz", "Caio", "Daniel", "Emanuela",
-							   "Fidalgo", "Gabriel", "Homero", "Ingrid", "Joana"};
+				   "Fidalgo", "Gabriel", "Homero", "Ingrid", "Joana"};
 	char lista_sobrenome[10][13] = {" da Silva", " Pereira", " Oliveira", " de Freitas",
-									" de Souza", " Heinsenberg", " Gilmour", " Macedo",
-									" Trindade", " di Pinto"};
-    char lista_ultimo_nome[10][15] = {" Vasconcelos", " Visconde", " Barbosa", " Nascimento",
+					" de Souza", " Heinsenberg", " Gilmour", " Macedo",
+					" Trindade", " di Pinto"};
+    	char lista_ultimo_nome[10][15] = {" Vasconcelos", " Visconde", " Barbosa", " Nascimento",
                                       " Pedreira", " Rocha", " Marconde", " de Rosa",
                                       " D'Avila", " Flores"};
 	char lista_nome_sobrenome[MAX][41];
 	int storage_str[3][10] = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-						  	  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-						  	  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
+				  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+				  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
     int lista_numeros[MAX];
     int lista_areas[MAX];
     int lista_moradores[MAX];
