@@ -1,3 +1,7 @@
+/*Trabalho de Algoritmos II - UNISANTOS - 2018.
+ *Função: Criar um programa para preencher informações sobre um condomínio.
+ *Autor: Ricardo de F. Oliveira - Ciência da Computação. 16/11/2018.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +9,7 @@
 
 #define MAX 40
 
+//Estrutura para armazenar informações sobre os moradores
 typedef struct {
 	char nome[101];
 	int numero;
@@ -15,11 +20,19 @@ typedef struct {
 
 data lares[MAX];
 
+//Estrutura auxiliar para criar nomes de moradores 'aleatórios'
+typedef struct {
+		char nome[10][15];
+		char sobrenome[10][13];
+		char ultimo[10][15];
+		char completo[MAX][41];
+		int storage[3][10];
+} montagem;
+
 void Menu(void);
 void PreencheAuto(void);
-void TrocaNum(int vet[][5]);
 void TrocaStr(int vet[][10]);
-void CriaNome(char pessoas[MAX][41], const char nomes[10][15], const char sobrenomes[10][13], const char ultimo[10][15], const int vet[][10]);
+void CriaNome(montagem *);
 void Numero(int, int, int * vet);
 void PreencheManu(void);
 void MostrarMoradores(void);
@@ -43,6 +56,7 @@ int main()
 
 void Menu()
 {
+	/*Menu amigável ao usuário*/
 	register int i;
 	int choice, choice2;
 
@@ -50,6 +64,7 @@ void Menu()
 	printf("\t\tBem Vindo(a) ao condominio Aguas\n");
 	printf("-------------------------------------------------------------\n");
 	do{
+		/*Looping principal que força o usuário a ter alguma informação no vetor de estrutura 'lares'*/
 		printf("\nEscolha o numero de uma das opcoes e digite-o:\n1 - Preencher condominos automaticamente;\n");
 		printf("2 - Preencher condominos manualmente;\n");
 		printf("3 - Mais opcoes;\n");
@@ -65,6 +80,7 @@ void Menu()
 				break;
 			case 3:
 				do{
+					/*Looping com informações adicionais para navegar por elas*/
 					printf("\n4 - Mostrar informacoes sobre os condominos;\n");
 					printf("5 - Area total do condominio;\n");
 					printf("6 - Despesas;\n");
@@ -96,6 +112,7 @@ void Menu()
 							fprintf(stderr, "\n\aResposta nao compreendida!\n");
 					}
 				}while(choice2 != 0);
+				break;
 			case 0:
 				printf("Adeus, visitante! :)\n");
 				choice = 0;
@@ -108,43 +125,47 @@ void Menu()
 
 void PreencheAuto()
 {
-	char lista_nome[10][15] = {"Ana", "Beatriz", "Caio", "Daniel", "Emanuela",
-				   "Fidalgo", "Gabriel", "Homero", "Ingrid", "Joana"};
-	char lista_sobrenome[10][13] = {" da Silva", " Pereira", " Oliveira", " de Freitas",
-					" de Souza", " Heinsenberg", " Gilmour", " Macedo",
-					" Trindade", " di Pinto"};
-	char lista_ultimo_nome[10][15] = {" Vasconcelos", " Visconde", " Barbosa", " Nascimento",
-                                          " Pedreira", " Rocha", " Marconde", " de Rosa",
-                                          " D'Avila", " Flores"};
-	char lista_nome_sobrenome[MAX][41];
-	int storage_str[3][10] = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-				  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-				  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
+	/*Para fins de teste e para poupar tempo, esta função cria informações aleatórias de moradores para preencher o vetor 'lares'*/
+	char lista_nome[10][15] = {"Ana", "Beatriz", "Caio", "Daniel", "Emanuela", "Fidalgo", "Gabriel", "Homero", "Ingrid", "Joana"};
+	char lista_sobrenome[10][13] = {" da Silva", " Pereira", " Oliveira", " de Freitas", " de Souza", " Heinsenberg", " Gilmour", " Macedo", " Trindade", " di Pinto"};
+	char lista_ultimo_nome[10][15] = {" Vasconcelos", " Visconde", " Barbosa", " Nascimento", " Pedreira", " Rocha", " Marconde", " de Rosa", " D'Avila", " Flores"};
 	int lista_numeros[MAX];
 	int lista_areas[MAX];
-	int lista_moradores[MAX];
-	float lista_valores[MAX];
 	register int i;
-	register float j;
+	montagem Pessoa;
 
-	TrocaStr(storage_str);
-	CriaNome(lista_nome_sobrenome, lista_nome, lista_sobrenome, lista_ultimo_nome, storage_str);
+	/*Preenchimento dos vetores auxiliares com alguns nomes, sobrenomes e últimos nomes*/
+	for(i = 0; i < 10; ++i){
+        strcpy(Pessoa.nome[i], lista_nome[i]);
+        strcpy(Pessoa.sobrenome[i], lista_sobrenome[i]);
+        strcpy(Pessoa.ultimo[i], lista_ultimo_nome[i]);
+        Pessoa.storage[0][i] = i;
+        Pessoa.storage[1][i] = i;
+        Pessoa.storage[2][i] = i;
+	}
+
+	/*Mudança dos valores fixos para gerar valores aleatórios*/
+	TrocaStr(Pessoa.storage);
+	CriaNome(&Pessoa);
 	Numero(2, 1, lista_numeros);
 	Numero(70, 5, lista_areas);
 
+	/*Preenchimento da estrutura 'lares' com informações aleatórias*/
 	for(i = 0; i < MAX; i++){
-		strcpy(lares[i].nome, lista_nome_sobrenome[i]);
+		strcpy(lares[i].nome, Pessoa.completo[i]);
 		lares[i].numero = lista_numeros[i];
 		lares[i].area = lista_areas[i];
-		j = rand() % 10;
-		lares[i].valor = lista_areas[i] * 10 + (i*j) / 10;
+		lares[i].valor = lista_areas[i] * 10 + (i * (rand() % 10)) / 10;
 		lares[i].moradores = (rand() % 5) + 1;
 	}
-	printf("\aPreenchimento automatico feito com sucesso!\n");
+	printf("\n\aPreenchimento automatico feito com sucesso!\n");
 }
 
 void TrocaStr(int vet[][10])
 {
+	/*Argumentos: vetor de 3 linhas e 10 colunas. Esse vetor guarda os índices, de 0 a 9, dos elementos do vetor Pessoa.storage.
+	 *Linha 0: nomes. Linha 1: sobrenomes. Linha 2: últimos nomes.
+	 *Colunas: Opções de nomes, sobrenomes e últimos nomes.*/
 	register int i, j, rnd1, rnd2, aux;
 
 	for(i = 0; i < 50; ++i){
@@ -160,11 +181,13 @@ void TrocaStr(int vet[][10])
 
 void Numero(int inicio, int operacao, int * vet)
 {
+	/*A função manipula um vetor, 'vet', para colocar nele valores com início em 'inicio', adicionando valores entre 'operacao' e
+	 *'operacao'*/
 	register int i, j, rnd1, rnd2, aux;
 
-	for(i = inicio, j = 0; j < MAX; i += operacao, j++){
+	for(i = inicio, j = 0; j < MAX; i += operacao, ++j){
 		vet[j] = i;
-	}
+    	}
 	for(i = 0; i < MAX; i++){
 		rnd1 = rand() % MAX;
 		rnd2 = rand() % MAX;
@@ -174,25 +197,26 @@ void Numero(int inicio, int operacao, int * vet)
 	}
 }
 
-void CriaNome(char pessoas[MAX][41], const char nomes[10][15], const char sobrenomes[10][13], const char ultimo[10][15], const int vet [][10])
+void CriaNome(montagem * Pessoa)
 {
+	/*Função recebe uma estrutura do tipo montagem e manipula ela. Cria pessoas aleatórias*/
 	register int i, j, rnd1, rnd2, sum = 0;
 
-	for(i = 0; i < 10; i++){
-		for(j = 0; j < 4; j++){
-			strcpy(pessoas[sum], nomes[vet[0][i]]);
+	for(i = 0; i < 10; ++i){
+		for(j = 0; j < 4; ++j){
+			strcpy(Pessoa->completo[sum], Pessoa->nome[Pessoa->storage[0][i]]);
 			if(j % 2 == 0){
                 		rnd1 = rand () % 10;
-               			rnd2 = rand() % 10;
-                		strcat(pessoas[sum], sobrenomes[vet[1][rnd1]]);
-                		strcat(pessoas[sum], ultimo[vet[2][rnd2]]);
+                		rnd2 = rand() % 10;
+                		strcat(Pessoa->completo[sum], Pessoa->sobrenome[Pessoa->storage[1][rnd1]]);
+                		strcat(Pessoa->completo[sum], Pessoa->ultimo[Pessoa->storage[2][rnd2]]);
                 		sum++;
                 		continue;
 			}
 			rnd1 = rand () % 10;
 			rnd2 = rand() % 10;
-			strcat(pessoas[sum], ultimo[vet[2][rnd2]]);
-			strcat(pessoas[sum], sobrenomes[vet[1][rnd1]]);
+			strcat(Pessoa->completo[sum], Pessoa->ultimo[Pessoa->storage[2][rnd2]]);
+			strcat(Pessoa->completo[sum], Pessoa->sobrenome[Pessoa->storage[1][rnd1]]);
             		sum++;
 		}
 	}
@@ -200,6 +224,7 @@ void CriaNome(char pessoas[MAX][41], const char nomes[10][15], const char sobren
 
 void Reset()
 {
+	/*Reseta a estrutura 'lares' para que não haja problemas com repetições anteriores a nova versão de 'lares'*/
 	register int i;
 
 	for(i = 0; i < MAX; ++i){
@@ -213,13 +238,17 @@ void Reset()
 
 void PreencheManu()
 {
+	printf("\n***********************************************************\n");
+	printf("\t\tPREENCHIMETNO MANUAL DE MORADORES");
+	printf("\n***********************************************************\n");
+	/*Preenchimento manual da estrutura 'lares'*/
 	register int i;
-	char nome[101], choice;
-	int numero, moradores;
-	float valor, area;
+	char nome[101], numero[51], moradores[51], valor[51], area[51], choice;
 
 	printf("\nDigite o <sair> no campo de nome para finalizar antes das 40 adicoes!");
-	for(i = 0; i < MAX; i++){
+	for(i = 0; i < MAX; ++i){
+		/*Preenchimento dos nomes com checagem de repetição*/
+		printf("\n______________________________________________________");
 		printf("\nNome (%03d): ", i+1);
 		scanf(" %[^\n]s", nome);
 		if(!strcmp(nome, "sair")){
@@ -227,60 +256,86 @@ void PreencheManu()
 			break;
 		}
 		while(CheckNome(nome)){
-			fprintf(stderr, "\nNome ja adcionado\nTem certeza que quer adiciona'-lo novamente? (s/n)>>> ");
+			fprintf(stderr, "\n<<< Nome ja adcionado! >>>\nTem certeza que quer adiciona'-lo novamente? (s/n)>>> ");
 			scanf(" %c", &choice);
 			if(choice == 's' || choice == 'S'){
 				strcpy(lares[i].nome, nome);
 				printf("Nome adicionado\n");
 				break;
-			}
-			if(choice == 'n' || choice == 'N'){
-				printf("Novo nome: ");
-				scanf(" %[^\n]s", nome);
-				continue;
 			}else{
-				printf("Resposta nao entendida!\n");
+				if(choice == 'n' || choice == 'N'){
+					printf("Novo nome: ");
+					scanf(" %[^\n]s", nome);
+					continue;
+				}
+				else{
+					printf("Resposta nao entendida!\n");
+				}
 			}
+
 		}
 		strcpy(lares[i].nome, nome);
 
+		/*Preenchimento dos números com checagem de repetição*/
 		printf("Numero do apartamento (%03d): ", i+1);
-		scanf("%d", &numero);
-		while(CheckNumero(numero)){
-			fprintf(stderr, "\nNumero ja adcionado\nTem certeza que quer adiciona'-lo novamente? (s/n)>>> ");
+		scanf(" %[^\n]s", numero);
+		while(!atoi(numero)){
+			fprintf(stderr, "\n<<< O numero informado nao e' um valor inteiro! >>>\nNumero do apartamento (%03d): ", i+1);
+			scanf(" %[^\n]s", numero);
+		}
+		while(CheckNumero(atoi(numero))){
+			fprintf(stderr, "\n<<< Numero ja adcionado! >>>\nTem certeza que quer adiciona'-lo novamente? (s/n)>>> ");
 			scanf(" %c", &choice);
 			if(choice == 's' || choice == 'S'){
-				lares[i].numero = numero;
+				lares[i].numero = atoi(numero);
 				printf("Numero adicionado\n");
 				break;
-			}
-			if(choice == 'n' || choice == 'N'){
-				printf("Novo numero: ");
-				scanf("%d", &numero);
-				continue;
 			}else{
-				printf("Resposta nao entendida!\n");
+				if(choice == 'n' || choice == 'N'){
+					printf("Novo numero: ");
+					scanf(" %[^\n]s", numero);
+					continue;
+				}
+				else{
+					printf("Resposta nao entendida!\n");
+				}
 			}
 		}
-		lares[i].numero = numero;
+		lares[i].numero = atoi(numero);
 
+		/*Preenchimento das áreas*/
 		printf("Area do apartamento (%03d): ", i+1);
-		scanf("%f", &area);
-		lares[i].area = area;
+		scanf(" %[^\n]s", area);
+		while(!atof(area)){
+			fprintf(stderr, "\n<<< A area informada nao e' um valor real! >>>\nArea do apartamento (%03d): ", i+1);
+			scanf(" %[^\n]s", area);
+		}
+		lares[i].area = atof(area);
 
+		/*Preenchimento do número de moradores*/
 		printf("Moradores do apartamento (%03d): ", i+1);
-		scanf("%d", &moradores);
-		lares[i].moradores = moradores;
+		scanf(" %[^\n]s", moradores);
+		while(!atoi(moradores)){
+			fprintf(stderr, "\n<<< Moradores informado nao e' um valor inteiro! >>>\nMoradores do apartamento (%03d): ", i+1);
+			scanf(" %[^\n]s", moradores);
+		}
+		lares[i].moradores = atoi(moradores);
 
+		/*Preenchimento dos valores*/
 		printf("Valor do apartamento (%03d): R$ ", i+1);
-		scanf("%f", &valor);
-		lares[i].valor = valor;
+		scanf(" %[^\n]s", valor);
+		while(!atof(valor)){
+			fprintf(stderr, "\n<<< O valor informado nao e' um valor real! >>>\nValor do apartamento (%03d): R$ ", i+1);
+			scanf(" %[^\n]s", valor);
+		}
+		lares[i].valor = atof(valor);
 	}
 }
 
 int CheckNome(const char * str)
 {
-	static char todos_nomes[40][31];
+	/*Argumentos: uma string constante que verifica se ela já foi usada antes, 'repetida'*/
+	static char todos_nomes[MAX][31];
 	static int lim = 0;
 	register int i;
 
@@ -300,7 +355,8 @@ int CheckNome(const char * str)
 
 int CheckNumero(int numero)
 {
-	static int todos_numeros[40], limi = 0;
+	/*Argumentos: valor inteiro, checa se esse número já foi usado para outro apartamento*/
+	static int todos_numeros[MAX], limi = 0;
 	register int i;
 
 	if(!limi){
@@ -319,9 +375,14 @@ int CheckNumero(int numero)
 
 void MostrarMoradores()
 {
+	printf("\n***********************************************************\n");
+	printf("\t\tTODOS OS MORADORES SAO:");
+	printf("\n***********************************************************\n");	
+	/*Mostra as informações de todos os moradores do condomínio*/
 	register int i;
 
 	for(i = 0; i < MAX; ++i){
+		printf("................................................\n");
 		printf("Proprietario: %s\n", lares[i].nome);
 		printf("Numero: %d\n", lares[i].numero);
 		printf("Area: %.2f m2\n", lares[i].area);
@@ -332,6 +393,7 @@ void MostrarMoradores()
 
 void AreaTotal()
 {
+	/*Calcula a área total do condomínio, baseia-se apenas em valores já registrados*/
 	register int i;
 	register float maior = 0, storage = 0;
 
@@ -341,38 +403,55 @@ void AreaTotal()
 			maior = lares[i].area;
 		}
 	}
+	printf("\n***********************************************************\n");
 	printf("\nProvavel area do condominio: %.2f m2\n", maior);
 	printf("Soma da area de todos os condominios: %.2f m2\n\n", storage);
+	printf("\n***********************************************************\n");
 }
 
 void Despesas()
 {
+	/*Calcula as despesas, usa informações oferecidas pelo usuário*/
+	printf("\n***********************************************************\n");
+	printf("\t\tDESPESAS");
+	printf("\n***********************************************************\n");
 	register int i;
-	float area, despesas, valor_pessoal;
+	char area[21], despesas[21];
+	float valor_pessoal;
 
 	printf("\nArea total do condominio: ");
-	scanf("%f", &area);
+	scanf(" %[^\n]s", area);
+	while(!atof(area)){
+		fprintf(stderr, "\n<<< A area informada nao e' um valor real! >>>\nArea total do condominio: ");
+	}
 	printf("Total de despesas: R$ ");
-	scanf("%f", &despesas);
-
+	scanf(" %[^\n]s", despesas);
+	while(!atof(despesas)){
+		fprintf(stderr, "\n<<< O total de despesas informadas nao e' um valor real! >>>\nTotal de despesas do condominio: ");
+	}
 	for(i = 0; i < MAX; ++i){
-		valor_pessoal = (despesas * lares[i].area)/ area;
+		valor_pessoal = (atof(despesas) * lares[i].area)/ atof(area);
 		printf("Despesa para o apartamento de numero (%03d): R$ %.2f\n\n", i+1, valor_pessoal);
 	}
 }
 
 void MaisMoradores()
 {
+	/*Mosta os apartamentos que possuem maior quantidade de moradores*/
+	printf("\n***********************************************************\n");
+	printf("\t\tAPARTAMENTOS COM MAIS MORADORES");
+	printf("\n***********************************************************\n");
 	register int i, j = 0;
 
 	for(i = 0; i < MAX; ++i){
-		if(lares[i].moradores > lares[j].moradores){
+		if(lares[i].moradores > j){
 			j = lares[i].moradores;
 		}
 	}
-	printf("\nApartamento(s) com mais numero de moradores: ");
+	printf("\nApartamento(s) com mais numero de moradores:\n");
 	for(i = 0; i < MAX; ++i){
 		if(lares[i].moradores == j){
+			printf("...................................................");
 			printf("\nProprietario: %s\n", lares[i].nome);
 			printf("Numero: %d\n", lares[i].numero);
 			printf("Moradores: %d\n", lares[i].moradores);
@@ -383,6 +462,7 @@ void MaisMoradores()
 
 void Ordenar()
 {
+	/*Ordena segundo ordem decrescente por tamanho de condominio*/
 	register int i, j;
 	data aux;
 
@@ -395,5 +475,7 @@ void Ordenar()
 			}
 		}
 	}
-	printf("\nApartamentos ordenados segundo ordem decrescente por tamanho de condominio\n\n");
+	printf("\n*****************************************************************************\n");
+	printf("\nApartamentos ordenados segundo ordem decrescente por tamanho de condominio\n");
+	printf("\n*****************************************************************************\n");
 }
