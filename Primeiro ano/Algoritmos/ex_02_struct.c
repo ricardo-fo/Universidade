@@ -251,7 +251,7 @@ void PreencheManu()
 			break;
 		}
 		while(CheckNome(nome)){
-			fprintf(stderr, "\n<<< Nome ja adicionado! >>>\nTem certeza que quer adiciona-lo novamente? (s/n)>>> ");
+			fprintf(stderr, "\n<<< Nome ja adicionado! >>>\nTem certeza que quer adiciona-lo novamente? (s/n)\n>>> ");
 			scanf(" %c", &choice);
 			if(choice == 's' || choice == 'S'){
 				strcpy(lares[i].nome, nome);
@@ -277,7 +277,7 @@ void PreencheManu()
 			scanf(" %[^\n]s", numero);
 		}
 		while(CheckNumero(atoi(numero))){
-			fprintf(stderr, "\n<<< Numero ja adicionado! >>>\nTem certeza que quer adiciona-lo novamente? (s/n)>>> ");
+			fprintf(stderr, "\n<<< Numero ja adicionado! >>>\nTem certeza que quer adiciona-lo novamente? (s/n)\n>>> ");
 			scanf(" %c", &choice);
 			if(choice == 's' || choice == 'S'){
 				lares[i].numero = atoi(numero);
@@ -363,6 +363,7 @@ int CheckNumero(int numero)
 			return 1;
 		}
 	}
+	todos_numeros[limi] = numero;
 	return 0;
 }
 
@@ -406,7 +407,7 @@ void Despesas()
 {
 	/*Calcula as despesas, usa informações oferecidas pelo usuário*/
 	printf("\n***********************************************************\n");
-	printf("\t\tDESPESAS");
+	printf("\t\t\tDESPESAS");
 	printf("\n***********************************************************\n");
 	register int i;
 	char area[21], despesas[21];
