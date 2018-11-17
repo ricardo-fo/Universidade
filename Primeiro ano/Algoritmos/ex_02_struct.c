@@ -1,6 +1,6 @@
 /*Trabalho de Algoritmos II - UNISANTOS - 2018.
  *Função: Criar um programa para preencher informações sobre um condomínio.
- *Autor: Ricardo de F. Oliveira - Ciência da Computação. 16/11/2018.
+ *Autor: Ricardo de F. Oliveira - Ciência da Computação. 17/11/2018.
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,8 +54,7 @@ int main()
 void Menu()
 {
 	/*Menu amigável ao usuário*/
-	register int i;
-	char choice[51], choice2[51];
+	char choice[51], choice2[51], ch;
 
 	printf("*-----------------------------------------------------------*\n");
 	printf("|             Bem Vindo(a) ao condominio Aguas              |\n");
@@ -63,24 +62,27 @@ void Menu()
 	do{
 		/*Looping principal que força o usuário a ter alguma informação no vetor de estrutura 'lares'*/
 		printf("\nEscolha o numero de uma das opcoes e digite-o:              |\n");
-		printf("1 - Preencher condominos automaticamente;                   |\n");
-		printf("2 - Preencher condominos manualmente;                       |\n");
+		printf("1 - Preencher condomino automaticamente;                    |\n");
+		printf("2 - Preencher condomino manualmente;                        |\n");
 		printf("3 - Mais opcoes;                                            |\n");
 		printf("0 - Sair.                                                   |\n");
 		printf("------------------------------------------------------------*\n>>> ");
-		scanf(" %[^\n]s", choice);
+		scanf(" %50[^\n]", choice);
+		while((ch = getchar()) != '\n');
 		if(!strcmp(choice, "0")){
 				printf("Adeus, visitante :)\n");
 				break;
 		}
 		while(!atoi(choice)){
 			fprintf(stderr, "\n\a!!! Resposta nao compreendida !!!\n>>> ");
-			scanf(" %[^\n]s", choice);
+			scanf(" %50[^\n]", choice);
+			while((ch = getchar()) != '\n');
 			if(!strcmp(choice, "0")){
 				printf("Adeus, visitante :)\n");
 				break;
 			}
 		}
+		printf("\n");
 		switch(atoi(choice)){
 			case 1:
 				PreencheAuto();
@@ -94,26 +96,29 @@ void Menu()
 					/*Looping com informações adicionais para navegar por elas*/
 					printf("*-----------------------------------------------------------*\n");
 					printf("Escolha o numero de uma das opcoes e digite-o:              |\n");
-					printf("4 - Mostrar informacoes sobre os condominos;                |\n");
+					printf("4 - Mostrar informacoes sobre os apartamentos;              |\n");
 					printf("5 - Area total do condominio;                               |\n");
 					printf("6 - Despesas;                                               |\n");
 					printf("7 - Apartamento com mais moradores;                         |\n");
 					printf("8 - Ordenar por tamanho do apartamento;                     |\n");
 					printf("0 - Retornar...                                             |\n");
 					printf("*-----------------------------------------------------------*\n>>> ");
-					scanf(" %[^\n]s", choice2);
+					scanf(" %50[^\n]", choice2);
+					while((ch = getchar()) != '\n');
 					if(!strcmp(choice2, "0")){
 						printf(". . .");
 						break;
 					}
 					while(!atoi(choice2)){
 						fprintf(stderr, "\n\a!!! Resposta nao compreendida !!!\n>>> ");
-						scanf(" %[^\n]s", choice2);
+						scanf(" %50[^\n]", choice2);
+						while((ch = getchar()) != '\n');
 						if(!strcmp(choice2, "0")){
 							printf(". . .");
 							break;
 						}
 					}
+					printf("\n");
 					switch(atoi(choice2)){
 						case 4:
 							MostrarMoradores();
@@ -173,7 +178,7 @@ void PreencheAuto()
 		strcpy(lares[i].nome, Pessoa.completo[i]);
 		lares[i].numero = lista_numeros[i];
 		lares[i].area = lista_areas[i];
-		lares[i].valor = lista_areas[i] * 10 + (i * (rand() % 10)) / 10;
+		lares[i].valor = (lista_areas[i] + rand() % 10) * 8030 + (i * (rand() % 10)) / 5.0;
 		lares[i].moradores = (rand() % 5) + 1;
 	}
 	printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -257,18 +262,19 @@ void Reset()
 void PreencheManu()
 {
 	printf("*************************************************************\n");
-	printf(">>>>>>>>>>>>> PREENCHIMETNO MANUAL DE MORADORES <<<<<<<<<<<<<\n");
+	printf(">>>>>>>>>>>> PREENCHIMETNO MANUAL DE MORADORES <<<<<<<<<<<<<<\n");
 	printf("*************************************************************\n");
 	/*Preenchimento manual da estrutura 'lares'*/
 	register int i;
-	char nome[101], numero[51], moradores[51], valor[51], area[51], choice;
+	char nome[101], numero[51], moradores[51], valor[51], area[51], choice, ch;
 
 	printf("\nDigite o 'sair', sem as aspas, no campo 'nome' para finalizar\nantes das 40 adicoes!");
 	for(i = 0; i < MAX; ++i){
 		/*Preenchimento dos nomes com checagem de repetição*/
 		printf("\n...........................................................");
 		printf("\nNome (%03d): ", i+1);
-		scanf(" %[^\n]s", nome);
+		scanf(" %100[^\n]", nome);
+		while((ch = getchar()) != '\n');
 		if(!strcmp(nome, "sair") || !strcmp(nome, "SAIR")){
 			printf(". . .\n");
 			break;
@@ -276,6 +282,7 @@ void PreencheManu()
 		while(CheckNome(nome)){
 			fprintf(stderr, "\n\a<<< Nome ja adicionado! >>>\nTem certeza que quer adiciona-lo novamente? (s/n)\n>>> ");
 			scanf(" %c", &choice);
+			while((ch = getchar()) != '\n');
 			if(choice == 's' || choice == 'S'){
 				strcpy(lares[i].nome, nome);
 				printf(">>> Nome adicionado <<<\n");
@@ -283,7 +290,8 @@ void PreencheManu()
 			}else{
 				if(choice == 'n' || choice == 'N'){
 					printf("Novo nome: ");
-					scanf(" %[^\n]s", nome);
+					scanf(" %100[^\n]", nome);
+					while((ch = getchar()) != '\n');
 					continue;
 				}else{
 					printf("!!! Resposta nao entendida !!!\n");
@@ -294,14 +302,17 @@ void PreencheManu()
 
 		/*Preenchimento dos números com checagem de repetição*/
 		printf("Numero do apartamento (%03d): ", i+1);
-		scanf(" %[^\n]s", numero);
+		scanf(" %50[^\n]", numero);
+		while((ch = getchar()) != '\n');
 		while(!atoi(numero)){
 			fprintf(stderr, "\n\a<<< O numero informado nao e' um valor inteiro! >>>\nNumero do apartamento (%03d): ", i+1);
-			scanf(" %[^\n]s", numero);
+			scanf(" %50[^\n]", numero);
+			while((ch = getchar()) != '\n');
 		}
 		while(CheckNumero(atoi(numero))){
 			fprintf(stderr, "\n\a<<< Numero ja adicionado! >>>\nTem certeza que quer adiciona-lo novamente? (s/n)\n>>> ");
 			scanf(" %c", &choice);
+			while((ch = getchar()) != '\n');
 			if(choice == 's' || choice == 'S'){
 				lares[i].numero = atoi(numero);
 				printf(">>> Numero adicionado <<<\n");
@@ -309,7 +320,8 @@ void PreencheManu()
 			}else{
 				if(choice == 'n' || choice == 'N'){
 					printf("Novo numero: ");
-					scanf(" %[^\n]s", numero);
+					scanf(" %50[^\n]", numero);
+					while((ch = getchar()) != '\n');
 					continue;
 				}else{
 					printf("!!! Resposta nao entendida !!!\n");
@@ -320,28 +332,34 @@ void PreencheManu()
 
 		/*Preenchimento das áreas*/
 		printf("Area do apartamento (%03d): ", i+1);
-		scanf(" %[^\n]s", area);
+		scanf(" %50[^\n]", area);
+		while((ch = getchar()) != '\n');
 		while(!atof(area)){
 			fprintf(stderr, "\n\a<<< A area informada nao e' um valor real! >>>\nArea do apartamento (%03d): ", i+1);
-			scanf(" %[^\n]s", area);
+			scanf(" %50[^\n]", area);
+			while((ch = getchar()) != '\n');
 		}
 		lares[i].area = atof(area);
 
 		/*Preenchimento do número de moradores*/
 		printf("Moradores do apartamento (%03d): ", i+1);
-		scanf(" %[^\n]s", moradores);
+		scanf(" %50[^\n]", moradores);
+		while((ch = getchar()) != '\n');
 		while(!atoi(moradores)){
 			fprintf(stderr, "\n\a<<< Moradores informado nao e' um valor inteiro! >>>\nMoradores do apartamento (%03d): ", i+1);
-			scanf(" %[^\n]s", moradores);
+			scanf(" %50[^\n]", moradores);
+			while((ch = getchar()) != '\n');
 		}
 		lares[i].moradores = atoi(moradores);
 
 		/*Preenchimento dos valores*/
 		printf("Valor do apartamento (%03d): R$ ", i+1);
-		scanf(" %[^\n]s", valor);
+		scanf(" %50[^\n]", valor);
+		while((ch = getchar()) != '\n');
 		while(!atof(valor)){
 			fprintf(stderr, "\n\a<<< O valor informado nao e' um valor real! >>>\nValor do apartamento (%03d): R$ ", i+1);
-			scanf(" %[^\n]s", valor);
+			scanf(" %50[^\n]", valor);
+			while((ch = getchar()) != '\n');
 		}
 		lares[i].valor = atof(valor);
 	}
@@ -421,6 +439,7 @@ void AreaTotal()
 			maior = lares[i].area;
 		}
 	}
+	printf("*************************************************************\n");
 	printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	printf("+          Provavel area do condominio: %.2f m2             \n", maior);
 	printf("+       Soma da area de todos os condominios: %.2f m2       \n", storage);
@@ -434,20 +453,24 @@ void Despesas()
 	printf(">>>>>>>>>>>>>>>>>>>>>>>> DESPESAS <<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 	printf("*************************************************************\n");
 	register int i;
-	char area[21], despesas[21];
+	char area[21], despesas[21], ch;
 	float valor_pessoal;
 
 	printf("\nArea total do condominio: ");
-	scanf(" %[^\n]s", area);
+	scanf(" %20[^\n]", area);
+	while((ch = getchar()) != '\n');
 	while(!atof(area)){
 		fprintf(stderr, "\n\a<<< A area informada nao e' um valor real! >>>\nArea total do condominio: ");
-		scanf(" %[^\n]s", area);
+		scanf(" %20[^\n]", area);
+		while((ch = getchar()) != '\n');
 	}
 	printf("Total de despesas: R$ ");
-	scanf(" %[^\n]s", despesas);
+	scanf(" %20[^\n]", despesas);
+	while((ch = getchar()) != '\n');
 	while(!atof(despesas)){
 		fprintf(stderr, "\n\a<<< O total de despesas informadas nao e' um valor real! >>>\nTotal de despesas do condominio: ");
-		scanf(" %[^\n]s", despesas);
+		scanf(" %20[^\n]", despesas);
+		while((ch = getchar()) != '\n');
 	}
 	for(i = 0; i < MAX; ++i){
 		valor_pessoal = (atof(despesas) * lares[i].area)/ atof(area);
