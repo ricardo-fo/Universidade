@@ -1,6 +1,6 @@
 /*Trabalho de Algoritmos II - UNISANTOS - 2018.
  *Função: Criar um programa para preencher informações sobre um condomínio.
- *Autor: Ricardo de F. Oliveira - Ciência da Computação. 17/11/2018.
+ *Autor: Ricardo de F. Oliveira - Ciência da Computação. 16/11/2018.
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +57,7 @@ void Menu()
 	char choice[51], choice2[51], ch;
 
 	printf("*-----------------------------------------------------------*\n");
-	printf("|             Bem Vindo(a) ao condominio Aguas              |\n");
+	printf("|             Bem-vindo(a) ao condominio Aguas              |\n");
 	printf("*-----------------------------------------------------------*\n");
 	do{
 		/*Looping principal que força o usuário a ter alguma informação no vetor de estrutura 'lares'*/
@@ -231,16 +231,10 @@ void CriaNome(montagem * Pessoa)
 		for(j = 0; j < 4; ++j){
 			strcpy(Pessoa->completo[sum], Pessoa->nome[Pessoa->storage[0][i]]);
 			rnd1 = rand () % 10;
-                	rnd2 = rand() % 10;
-			if(j % 2 == 0){
-                		strcat(Pessoa->completo[sum], Pessoa->sobrenome[Pessoa->storage[1][rnd1]]);
-                		strcat(Pessoa->completo[sum], Pessoa->ultimo[Pessoa->storage[2][rnd2]]);
-                		sum++;
-                		continue;
-			}
-			strcat(Pessoa->completo[sum], Pessoa->ultimo[Pessoa->storage[2][rnd2]]);
-			strcat(Pessoa->completo[sum], Pessoa->sobrenome[Pessoa->storage[1][rnd1]]);
-            		sum++;
+            rnd2 = rand() % 10;
+            strcat(Pessoa->completo[sum], (rnd1 % 2) == 0? Pessoa->sobrenome[Pessoa->storage[1][rnd1]]: Pessoa->ultimo[Pessoa->storage[2][rnd2]]);
+            strcat(Pessoa->completo[sum], (rnd1 % 2) == 0? Pessoa->ultimo[Pessoa->storage[2][rnd2]]: Pessoa->sobrenome[Pessoa->storage[1][rnd1]]);
+            sum++;
 		}
 	}
 }
