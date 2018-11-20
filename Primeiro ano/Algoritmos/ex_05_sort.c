@@ -112,11 +112,8 @@ void PorNaipe(const int * naipe)
 	register int i;
 
 	for(i = 0; i < 14; ++i){
-		/*if(naipe[i] >= 10){
+		if(naipe[i] > 10){
 			switch(naipe[i]){
-				case 10:
-					printf("%d\n", naipe[i]);
-					break;
 				case 11:
 					printf(" J\n");
 					break;
@@ -128,7 +125,7 @@ void PorNaipe(const int * naipe)
 					break;
 			}
 			continue;
-		}*/
+		}
 		printf(" %d\n", naipe[i]);
 	}
 }
