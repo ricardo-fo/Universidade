@@ -1,4 +1,4 @@
-# Universidade
+# University
 
 This repository is a storage of my university life at Universidade Católica de Santos - UNISANTOS.
 For more informations about UNISANTOS, you may to acess these sites:
