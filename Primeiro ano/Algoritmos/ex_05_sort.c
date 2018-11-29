@@ -9,17 +9,18 @@ typedef struct{
 	int espadas[14];
 }cartas;
 
-void Ordenar(cartas *);
-void Mostrar(const cartas * );
-void CriaAuto(cartas *);
-void CriaManu(cartas *);
-void Aleatorio(int *);
-void Preenche(int *, int *);
-int Verificar(int *);
-void Adicionar(int *, const int *);
-void PorNaipe(const int *);
-void Selection(int *, int);
-void Swap(int *, int *);
+void ordenar(cartas *);
+void mostrar(const cartas * );
+void criaAuto(cartas *);
+void criaManu(cartas *);
+void aleatorio(int *);
+void preenche(int *, int *);
+int verificar(int *);
+void adicionar(int *, const int *);
+void porNaipe(const int *);
+void selection(int *, int);
+void swap(int *, int *);
+void insertion(int *, int);
 
 int main()
 {
@@ -38,16 +39,16 @@ int main()
 		scanf("%f", &choice);
 		switch((int)(choice)){
 			case 1:
-				CriaAuto(&baralho);
+				criaAuto(&baralho);
 				break;
 			case 2:
-				CriaManu(&baralho);
+				criaManu(&baralho);
 				break;
 			case 3:
-				Ordenar(&baralho);
+				ordenar(&baralho);
 				break;
 			case 4:
-				Mostrar(&baralho);
+				mostrar(&baralho);
 				break;
 			case 0:
 				printf("Adeus!\n");
@@ -60,17 +61,21 @@ int main()
 	return 0;
 }
 
-void Ordenar(cartas * baralho)
-{
-	Selection(baralho->copas, 14);
-	Selection(baralho->ouros, 14);
-	Selection(baralho->paus, 14);
-	Selection(baralho->espadas, 14);
-
+void ordenar(cartas * baralho)
+{/*
+	selection(baralho->copas, 14);
+	selection(baralho->ouros, 14);
+	selection(baralho->paus, 14);
+	selection(baralho->espadas, 14);
+*/
+	insertion(baralho->copas, 14);
+	insertion(baralho->ouros, 14);
+	insertion(baralho->paus, 14);
+	insertion(baralho->espadas, 14);
 	printf("\n>>> BARALHO ORDENADO COM SUCESSO <<<\n");
 }
 
-void Selection(int * carta, int max)
+void selection(int * carta, int max)
 {
 	register int i, j, min_idx;
 
@@ -80,40 +85,55 @@ void Selection(int * carta, int max)
 			if(carta[j] > carta[min_idx]){
 				min_idx = j;
 			}
-			Swap(&carta[min_idx], &carta[i]);
+			swap(&carta[min_idx], &carta[i]);
 		}
 	}
 }
 
-void Swap(int * one, int * two)
+void swap(int * one, int * two)
 {
     int three = *one;
     *one = *two;
     *two = three;
 }
 
-void Mostrar(const cartas * baralho)
+void insertion(int * vet, int max)
 {
-	register int i;
-	char naipes[4][8] = {"Copas", "Ouros", "Paus", "Espadas"};
-
-	printf("\nCopas:\n");
-	PorNaipe(baralho->copas);
-	printf("\nOuros:\n");
-	PorNaipe(baralho->ouros);
-	printf("\nPaus:\n");
-	PorNaipe(baralho->paus);
-	printf("\nEspadas:\n");
-	PorNaipe(baralho->espadas);
+	register int i, j, key;
+	for(i = 1; i < max; i++){
+		key = vet[i];
+		j = i - 1;
+		while(j >= 0 && vet[j] > key){
+			vet[j+1] = vet[j];
+			j = j - 1;
+		}
+		vet[j + 1] = key;
+	}
 }
 
-void PorNaipe(const int * naipe)
+
+void mostrar(const cartas * baralho)
+{
+	printf("\nCopas:\n");
+	porNaipe(baralho->copas);
+	printf("\nOuros:\n");
+	porNaipe(baralho->ouros);
+	printf("\nPaus:\n");
+	porNaipe(baralho->paus);
+	printf("\nEspadas:\n");
+	porNaipe(baralho->espadas);
+}
+
+void porNaipe(const int * naipe)
 {
 	register int i;
 
 	for(i = 0; i < 14; ++i){
-		if(naipe[i] > 10){
+		if(naipe[i] >= 10){
 			switch(naipe[i]){
+				case 10:
+					printf("%d\n", naipe[i]);
+					break;
 				case 11:
 					printf(" J\n");
 					break;
@@ -130,22 +150,22 @@ void PorNaipe(const int * naipe)
 	}
 }
 
-void CriaAuto(cartas * baralho)
+void criaAuto(cartas * baralho)
 {
 	int vet[14] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
 
-	Aleatorio(vet);
-	Preenche(baralho->copas, vet);
-	Aleatorio(vet);
-	Preenche(baralho->ouros, vet);
-	Aleatorio(vet);
-	Preenche(baralho->paus, vet);
-	Aleatorio(vet);
-	Preenche(baralho->espadas, vet);
+	aleatorio(vet);
+	preenche(baralho->copas, vet);
+	aleatorio(vet);
+	preenche(baralho->ouros, vet);
+	aleatorio(vet);
+	preenche(baralho->paus, vet);
+	aleatorio(vet);
+	preenche(baralho->espadas, vet);
 	printf("\n>>> BARALHO ALEATORIO CRIADO COM SUCESSO <<<\n");
 }
 
-void Aleatorio(int * vet)
+void aleatorio(int * vet)
 {
 	register int i, j, rnd1, rnd2, aux;
 
@@ -160,7 +180,7 @@ void Aleatorio(int * vet)
 	}
 }
 
-void Preenche(int * naipes, int * vet)
+void preenche(int * naipes, int * vet)
 {
 	register int i;
 
@@ -169,7 +189,7 @@ void Preenche(int * naipes, int * vet)
 	}
 }
 
-void CriaManu(cartas * baralho)
+void criaManu(cartas * baralho)
 {
 	int teste, confimar[14] = {0};
 	register int i, j;
@@ -183,19 +203,19 @@ void CriaManu(cartas * baralho)
 			scanf("%d", &teste);
 			confimar[j] = teste;
 		}
-		if(Verificar(confimar)){
+		if(verificar(confimar)){
 			switch(i){
 				case 0:
-					Adicionar(baralho->copas, confimar);
+					adicionar(baralho->copas, confimar);
 					break;
 				case 1:
-					Adicionar(baralho->ouros, confimar);
+					adicionar(baralho->ouros, confimar);
 					break;
 				case 2:
-					Adicionar(baralho->paus, confimar);
+					adicionar(baralho->paus, confimar);
 					break;
 				case 3:
-					Adicionar(baralho->espadas, confimar);
+					adicionar(baralho->espadas, confimar);
 					break;
 			}
 			continue;
@@ -205,13 +225,12 @@ void CriaManu(cartas * baralho)
 	}
 }
 
-int Verificar(int * confimar)
+int verificar(int * confimar)
 {
 	register int i;
 
-	Selection(confimar, 14);
+	insertion(confimar, 14);
 	for(i = 0; i < 14; ++i){
-		printf("confirmar[%d](%d) != %d+1\n", i, confimar[i], i);
 		if(confimar[i] != i+1)
 			return 0;
 	}
@@ -219,7 +238,7 @@ int Verificar(int * confimar)
 
 }
 
-void Adicionar(int * naipe, const int * confimar)
+void adicionar(int * naipe, const int * confimar)
 {
 	register int i;
 
