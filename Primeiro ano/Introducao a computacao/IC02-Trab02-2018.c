@@ -1,5 +1,14 @@
+/*
+ * Trabalho 02 de Introdução à Computação II - UNISANTOS - 2018
+ * Autores:
+ * Alexandre Saura   | C.C.
+ * Fábio Thomaz      | C.C.
+ * Ricardo Oliveira  | C.C.
+ * Professor: Ciro Cirne Trindade
+*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
 	int cod;
@@ -18,7 +27,8 @@ typedef struct {
 	float preco;
 } tpreco;
 
-void cadastar_prod(void);
+void cadastrar_prod(void);
+int pegar_cod(void);
 void listar_prod(void);
 void alterar_prod(void);
 void cadastrar_loja(void);
@@ -44,13 +54,13 @@ int main()
 		printf("| <8> Consultar preco de produto;  |\n");
 		printf("| <0> Sair.                        |\n");
 		printf("*----------------------------------*\n>>> ");
-		scanf("%f", &op);
+		scanf("%d", &op);
 
 		switch(op){
 			case 0:
 				break;
 			case 1:
-				cadastar_prod();
+				cadastrar_prod();
 				break;
 			case 2:
 				alterar_prod();
@@ -81,7 +91,58 @@ int main()
 
 void cadastrar_prod()
 {
+	/*Este procedimento cadastra novos produtos*/
+	FILE * pin;
+	int codigo = pegar_cod();
 
+	printf("************************************\n");
+	printf("*        CADASTRO DE PRODUTOS      *\n");
+	printf("************************************\n");
+	printf("* Para sair, digite 'sair' na des- *\n");
+	printf("* -cricao                          *\n");
+	if((pin = fopen("produtos.dat", "ab")) == NULL){
+		fprintf(stderr, "Erro ao abrir 'produtos.dat'!\n");
+		exit(1);
+	}
+	tproduto produto;
+	char descricao[51];
+	int i = 1;
+
+	do{
+		printf("************************************\n");
+		printf("Produto %03d\n", i++);
+		printf("Codigo: %d\n", ++codigo);
+		printf("Descricao: ");
+		scanf(" %50[^\n]", descricao);
+		if(!strcmp(descricao, "sair"))
+			break;
+		while(getchar() != '\n');
+
+		produto.cod = codigo;
+		strcpy(produto.descricao, descricao);
+
+		fwrite(&produto, sizeof(tproduto), 1, pin);
+
+	}while(strcmp(descricao, "sair"));
+	fclose(pin);
+	printf("\n");
+}
+
+int pegar_cod()
+{
+	/*Esta função retorna o número do último produto cadastrado*/
+	FILE * pout;
+	int codigo;
+
+	if((pout = fopen("produtos.dat", "rb")) == NULL){
+		fprintf(stderr, "\a\nErro ao ler o arquivo 'produtos.dat'!\n");
+		exit(1);
+	}
+	fseek(pout, 0, SEEK_END);
+	codigo = ftell(pout) / sizeof(tproduto) + 1;
+	fclose(pout);
+
+	return codigo;
 }
 
 void listar_prod()
