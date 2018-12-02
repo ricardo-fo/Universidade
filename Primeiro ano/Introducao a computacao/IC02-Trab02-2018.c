@@ -86,6 +86,7 @@ int main()
 			default:
 				fprintf(stderr, "\n\aOpcao invalida!\n");
 		}
+		printf("\n");
 	}while(op != 0);
 }
 
@@ -130,16 +131,20 @@ void cadastrar_prod()
 
 int pegar_cod()
 {
-	/*Esta função retorna o número do último produto cadastrado*/
+	/*Esta função retorna o código do último produto cadastrado*/
 	FILE * pout;
 	int codigo;
 
-	if((pout = fopen("produtos.dat", "rb")) == NULL){
+	if((pout = fopen("produtos.dat", "a+b")) == NULL){
 		fprintf(stderr, "\a\nErro ao ler o arquivo 'produtos.dat'!\n");
 		exit(1);
 	}
 	fseek(pout, 0, SEEK_END);
-	codigo = ftell(pout) / sizeof(tproduto) + 1;
+	if(!ftell(pout)){
+        fclose(pout);
+        return 0;
+	}
+	codigo = ftell(pout) / sizeof(tproduto);
 	fclose(pout);
 
 	return codigo;
