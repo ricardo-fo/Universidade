@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef struct {
 	int cod;
@@ -30,6 +31,7 @@ typedef struct {
 void cadastrar_prod(void);
 int pegar_cod(void);
 void listar_prod(void);
+void ordenar(tproduto *, int);
 void alterar_prod(void);
 void cadastrar_loja(void);
 void listar_loja(void);
@@ -88,6 +90,8 @@ int main()
 		}
 		printf("\n");
 	}while(op != 0);
+
+	return 0;
 }
 
 void cadastrar_prod()
@@ -102,7 +106,7 @@ void cadastrar_prod()
 	printf("* Para sair, digite 'sair' na des- *\n");
 	printf("* -cricao                          *\n");
 	if((pin = fopen("produtos.dat", "ab")) == NULL){
-		fprintf(stderr, "Erro ao abrir 'produtos.dat'!\n");
+		fprintf(stderr, "\n\aErro ao abrir 'produtos.dat'!\n");
 		exit(1);
 	}
 	tproduto produto;
@@ -115,15 +119,13 @@ void cadastrar_prod()
 		printf("Codigo: %d\n", ++codigo);
 		printf("Descricao: ");
 		scanf(" %50[^\n]", descricao);
+		while(getchar() != '\n');
 		if(!strcmp(descricao, "sair"))
 			break;
-		while(getchar() != '\n');
 
 		produto.cod = codigo;
 		strcpy(produto.descricao, descricao);
-
 		fwrite(&produto, sizeof(tproduto), 1, pin);
-
 	}while(strcmp(descricao, "sair"));
 	fclose(pin);
 	printf("\n");
@@ -136,13 +138,13 @@ int pegar_cod()
 	int codigo;
 
 	if((pout = fopen("produtos.dat", "a+b")) == NULL){
-		fprintf(stderr, "\a\nErro ao ler o arquivo 'produtos.dat'!\n");
+		fprintf(stderr, "\n\aErro ao ler o arquivo 'produtos.dat'!\n");
 		exit(1);
 	}
 	fseek(pout, 0, SEEK_END);
 	if(!ftell(pout)){
-        fclose(pout);
-        return 0;
+        	fclose(pout);
+        	return 0;
 	}
 	codigo = ftell(pout) / sizeof(tproduto);
 	fclose(pout);
@@ -152,12 +154,93 @@ int pegar_cod()
 
 void listar_prod()
 {
+	/*Mostra as informações sobre os produtos; baseia-se em ordem
+	alfabética*/
+	FILE * pout;
 
+	if((pout = fopen("produtos.dat", "rb")) == NULL){
+		fprintf(stderr, "\n\aErro ao ler o arquivo 'produtos.dat'!\n");
+		exit(1);
+	}
+
+	fseek(pout, 0, SEEK_END);
+	int i, tam = ftell(pout)/sizeof(tproduto);
+	tproduto produtos[tam];
+	rewind(pout);
+	fread(produtos, sizeof(tproduto), tam, pout);
+	ordenar(produtos, tam);
+	fclose(pout);
+
+	printf("+----------------------------------- --- -- -\n");
+	printf("|Codigo     | Descricao             \n");
+	printf("+-----------+----------------------- --- -- -\n");
+	for(i = 0; i < tam; i++){
+        	printf("+-----------+----------------------- --- -- -\n");
+        	printf("|%010d |%s\n", produtos[i].cod, produtos[i].descricao);
+	}
+	printf("+-----------+----------------------- --- -- -\n");
+}
+
+void ordenar(tproduto * produtos, int max)
+{
+	/*Ordenação por ordem alfabética usando Insertion Sort*/
+	register int i, j;
+	tproduto key;
+
+	for(i = 1; i < max; i++){
+		key = produtos[i];
+		j = i-1;
+		while(j >= 0 && strcasecmp(produtos[j].descricao, key.descricao) > 0){
+            		produtos[j+1] = produtos[j];
+            		j--;
+		}
+		produtos[j+1] = key;
+	}
 }
 
 void alterar_prod()
 {
+	/*Altera a descricao de um produto*/
+	FILE * pin;
+	int codigo;
 
+	printf("************************************\n");
+	printf("*       ALTERACAO DE PRODUTO       *\n");
+	printf("************************************\n");
+	printf("* Digite 'sair' na nova descricao  *\n");
+	printf("* para cancelar a acao             *\n");
+	printf("************************************\n");
+	printf("Codigo do produto: ");
+	scanf("%d", &codigo);
+
+	if((pin = fopen("produtos.dat", "r+b")) == NULL){
+		fprintf(stderr, "\n\aErro ao abrir 'produtos.dat'!\n");
+		exit(1);
+	}
+	tproduto produto;
+	fseek(pin, (codigo-1) * sizeof(tproduto), SEEK_SET);
+	fread(&produto, sizeof(tproduto), 1, pin);
+
+	if(produto.cod == codigo){
+		printf("\nDescricao: %s\n", produto.descricao);
+	}else{
+		printf("\nProduto nao encontrado!\n");
+		return;
+	}
+
+	char descricao[51];
+	printf("Nova descricao: ");
+	scanf(" %50[^\n]", descricao);
+	while(getchar() != '\n');
+	if(!strcmp(descricao, "sair")){
+		fclose(pin);
+		return;
+	}
+	produto.cod = codigo;
+	strcpy(produto.descricao, descricao);
+	fseek(pin, -sizeof(tproduto), SEEK_CUR);
+	fwrite(&produto, sizeof(tproduto), 1, pin);
+	fclose(pin);
 }
 
 void cadastrar_preco()
