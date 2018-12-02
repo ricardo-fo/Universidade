@@ -11,7 +11,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define fpd "produtos.dat"
+#define fpd "produtos.dat" //Atalhos para o nome dos arquivos
 #define flj "lojas.dat"
 #define fpc "precos.dat"
 
@@ -46,6 +46,7 @@ void consultar_preco(void);
 
 int main()
 {
+	/*Menu principal com looping*/
 	int op;
 
 	do{
@@ -110,7 +111,7 @@ void cadastrar_prod()
 	printf("************************************\n");
 	printf("* Para sair, digite 'sair' na des- *\n");
 	printf("* -cricao                          *\n");
-	if((pin = fopen("produtos.dat", "ab")) == NULL){
+	if((pin = fopen(fpd, "ab")) == NULL){
 		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", fpd);
 		exit(1);
 	}
@@ -153,17 +154,17 @@ int pegar_cod(char * arquivo, int num)
         	return 0;
 	}
 	switch(num){
-        case 1:
-            codigo = ftell(pout) / sizeof(tproduto);
-            break;
-        case 2:
-            codigo = ftell(pout) / sizeof(tloja);
-            break;
-        case 3:
-            codigo = ftell(pout) / sizeof(tpreco);
-            break;
-        default:
-            fprintf(stderr, "\n\aAlgo deu errado!\n");
+        	case 1:
+            		codigo = ftell(pout) / sizeof(tproduto);
+           		break;
+        	case 2:
+            		codigo = ftell(pout) / sizeof(tloja);
+            		break;
+        	case 3:
+            		codigo = ftell(pout) / sizeof(tpreco);
+            		break;
+        	default:
+            		fprintf(stderr, "\n\aAlgo deu errado!\n");
 	}
 	fclose(pout);
 
