@@ -11,6 +11,10 @@
 #include <string.h>
 #include <ctype.h>
 
+#define fpd "produtos.dat"
+#define flj "lojas.dat"
+#define fpc "precos.dat"
+
 typedef struct {
 	int cod;
 	char descricao[51];
@@ -29,12 +33,13 @@ typedef struct {
 } tpreco;
 
 void cadastrar_prod(void);
-int pegar_cod(void);
+int pegar_cod(char *, int);
 void listar_prod(void);
-void ordenar(tproduto *, int);
+void ordenar_prod(tproduto *, int);
 void alterar_prod(void);
 void cadastrar_loja(void);
 void listar_loja(void);
+void ordenar_loja(tloja *, int);
 void cadastrar_preco(void);
 void listar_preco(void);
 void consultar_preco(void);
@@ -96,9 +101,9 @@ int main()
 
 void cadastrar_prod()
 {
-	/*Este procedimento cadastra novos produtos*/
+	/*Este procedimento cadastra novos produtos no arquivo 'produtos.dat'*/
 	FILE * pin;
-	int codigo = pegar_cod();
+	int codigo = pegar_cod(fpd, 1);
 
 	printf("************************************\n");
 	printf("*        CADASTRO DE PRODUTOS      *\n");
@@ -106,7 +111,7 @@ void cadastrar_prod()
 	printf("* Para sair, digite 'sair' na des- *\n");
 	printf("* -cricao                          *\n");
 	if((pin = fopen("produtos.dat", "ab")) == NULL){
-		fprintf(stderr, "\n\aErro ao abrir 'produtos.dat'!\n");
+		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", fpd);
 		exit(1);
 	}
 	tproduto produto;
@@ -122,7 +127,6 @@ void cadastrar_prod()
 		while(getchar() != '\n');
 		if(!strcmp(descricao, "sair"))
 			break;
-
 		produto.cod = codigo;
 		strcpy(produto.descricao, descricao);
 		fwrite(&produto, sizeof(tproduto), 1, pin);
@@ -131,14 +135,16 @@ void cadastrar_prod()
 	printf("\n");
 }
 
-int pegar_cod()
+int pegar_cod(char * arquivo, int num)
 {
-	/*Esta função retorna o código do último produto cadastrado*/
+	/*Esta função retorna o código do último item (produto, loja ou preco) cadastrado
+	 *Parâmetro 1: uma string (nome do arquivo a ser manipulado)
+	 *Parâmetro 2: um inteiro (tipo de estrutura que será manipulada)*/
 	FILE * pout;
 	int codigo;
 
-	if((pout = fopen("produtos.dat", "a+b")) == NULL){
-		fprintf(stderr, "\n\aErro ao ler o arquivo 'produtos.dat'!\n");
+	if((pout = fopen(arquivo, "a+b")) == NULL){
+		fprintf(stderr, "\n\aErro ao ler o arquivo '%s'!\n", arquivo);
 		exit(1);
 	}
 	fseek(pout, 0, SEEK_END);
@@ -146,7 +152,19 @@ int pegar_cod()
         	fclose(pout);
         	return 0;
 	}
-	codigo = ftell(pout) / sizeof(tproduto);
+	switch(num){
+        case 1:
+            codigo = ftell(pout) / sizeof(tproduto);
+            break;
+        case 2:
+            codigo = ftell(pout) / sizeof(tloja);
+            break;
+        case 3:
+            codigo = ftell(pout) / sizeof(tpreco);
+            break;
+        default:
+            fprintf(stderr, "\n\aAlgo deu errado!\n");
+	}
 	fclose(pout);
 
 	return codigo;
@@ -154,12 +172,15 @@ int pegar_cod()
 
 void listar_prod()
 {
-	/*Mostra as informações sobre os produtos; baseia-se em ordem
-	alfabética*/
+	/*Mostra as informações sobre os produtos; baseia-se em ordem alfabética*/
 	FILE * pout;
 
-	if((pout = fopen("produtos.dat", "rb")) == NULL){
-		fprintf(stderr, "\n\aErro ao ler o arquivo 'produtos.dat'!\n");
+	printf("************************************\n");
+	printf("*       LISTAGEM DE PRODUTOS       *\n");
+	printf("************************************\n");
+
+	if((pout = fopen(fpd, "rb")) == NULL){
+		fprintf(stderr, "\n\aErro ao ler o arquivo '%s'!\n", fpd);
 		exit(1);
 	}
 
@@ -168,7 +189,7 @@ void listar_prod()
 	tproduto produtos[tam];
 	rewind(pout);
 	fread(produtos, sizeof(tproduto), tam, pout);
-	ordenar(produtos, tam);
+	ordenar_prod(produtos, tam);
 	fclose(pout);
 
 	printf("+----------------------------------- --- -- -\n");
@@ -181,9 +202,9 @@ void listar_prod()
 	printf("+-----------+----------------------- --- -- -\n");
 }
 
-void ordenar(tproduto * produtos, int max)
+void ordenar_prod(tproduto * produtos, int max)
 {
-	/*Ordenação por ordem alfabética usando Insertion Sort*/
+	/*Ordenação de produtos por ordem alfabética usando Insertion Sort*/
 	register int i, j;
 	tproduto key;
 
@@ -200,7 +221,7 @@ void ordenar(tproduto * produtos, int max)
 
 void alterar_prod()
 {
-	/*Altera a descricao de um produto*/
+	/*Altera a descricao de um produto no arquivo 'produtos.dat'*/
 	FILE * pin;
 	int codigo;
 
@@ -213,8 +234,8 @@ void alterar_prod()
 	printf("Codigo do produto: ");
 	scanf("%d", &codigo);
 
-	if((pin = fopen("produtos.dat", "r+b")) == NULL){
-		fprintf(stderr, "\n\aErro ao abrir 'produtos.dat'!\n");
+	if((pin = fopen(fpd, "r+b")) == NULL){
+		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", fpd);
 		exit(1);
 	}
 	tproduto produto;
@@ -243,22 +264,107 @@ void alterar_prod()
 	fclose(pin);
 }
 
+
+void cadastrar_loja()
+{
+	/*Este procedimento cadastra novas lojas no arquivo 'lojas.dat'*/
+	FILE * pin;
+	int codigo = pegar_cod(flj, 2);
+
+	printf("************************************\n");
+	printf("*         CADASTRO DE LOJAS        *\n");
+	printf("************************************\n");
+	printf("* Para sair, digite 'sair' no nome *\n");
+	printf("* ou no site                       *\n");
+	if((pin = fopen(flj, "ab")) == NULL){
+		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", flj);
+		exit(1);
+	}
+	tloja loja;
+	char nome[41], site[81];
+	int i = 1;
+
+	do{
+		printf("************************************\n");
+		printf("Loja %03d\n", i++);
+		printf("Codigo: %d\n", ++codigo);
+		printf("Nome: ");
+		scanf(" %40[^\n]", nome);
+		while(getchar() != '\n');
+		if(!strcmp(nome, "sair"))
+			break;
+		printf("Site: ");
+		scanf(" %80[^\n]", site);
+		while(getchar() != '\n');
+		if(!strcmp(site, "sair"))
+			break;
+
+		loja.cod = codigo;
+		strcpy(loja.nome, nome);
+		strcpy(loja.site, site);
+		fwrite(&loja, sizeof(tloja), 1, pin);
+	}while(strcmp(nome, "sair") && strcmp(site, "sair"));
+	fclose(pin);
+	printf("\n");
+}
+
+void listar_loja()
+{
+	/*Mostra as informações sobre as lojas; baseia-se em ordem alfabética dos nomes*/
+	FILE * pout;
+
+	printf("************************************\n");
+	printf("*        LISTAGEM DE LOJAS         *\n");
+	printf("************************************\n");
+
+	if((pout = fopen(flj, "rb")) == NULL){
+		fprintf(stderr, "\n\aErro ao ler o arquivo '%s'!\n", flj);
+		exit(1);
+	}
+
+	fseek(pout, 0, SEEK_END);
+	int i, tam = ftell(pout)/sizeof(tloja);
+	tloja lojas[tam];
+	rewind(pout);
+	fread(lojas, sizeof(tloja), tam, pout);
+	ordenar_loja(lojas, tam);
+	fclose(pout);
+
+	char white[] = "                                        ";
+
+	printf("+-----------+-----------------------------------------+--------------- -- -\n");
+	printf("|Codigo     |Nome                                     | Site               \n");
+	printf("+-----------+-----------------------------------------+--------------- -- -\n");
+	for(i = 0; i < tam; i++){
+        	printf("+-----------+-----------------------------------------+--------------- -- -\n");
+        	printf("|%010d |%s %s|%s\n", lojas[i].cod, lojas[i].nome, &white[strlen(lojas[i].nome)], lojas[i].site);
+	}
+	printf("+-----------+-----------------------------------------+--------------- -- -\n");
+}
+
+void ordenar_loja(tloja * lojas, int max)
+{
+	/*Ordenação das lojas por ordem alfabética usando Insertion Sort*/
+	register int i, j;
+	tloja key;
+
+	for(i = 1; i < max; i++){
+		key = lojas[i];
+		j = i-1;
+		while(j >= 0 && strcasecmp(lojas[j].nome, key.nome) > 0){
+            		lojas[j+1] = lojas[j];
+            		j--;
+		}
+		lojas[j+1] = key;
+	}
+}
+
 void cadastrar_preco()
 {
 
 }
 
 void listar_preco()
-{
-
-}
-
-void cadastrar_loja()
-{
-
-}
-
-void listar_loja()
 {
 
 }
