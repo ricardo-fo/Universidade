@@ -9,11 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
-#define fpd "produtos.dat" //Atalhos para o nome dos arquivos
-#define flj "lojas.dat"
-#define fpc "precos.dat"
+#define FPD "produtos.dat" //FILE_PRODUTOS
+#define FLJ "lojas.dat"    //FILE_LOJAS
+#define FPC "precos.dat"   //FILE_PRECOS
 
 typedef struct {
 	int cod;
@@ -33,20 +32,19 @@ typedef struct {
 } tpreco;
 
 void cadastrar_prod(void);
-int pegar_cod(char *, int);
+int pegar_cod(const char *, int);
 void listar_prod(void);
-void ordenar_prod(tproduto *, int);
+void ordenar(int, int, tproduto *, tloja *, tpreco *);
 void alterar_prod(void);
 void cadastrar_loja(void);
 void listar_loja(void);
-void ordenar_loja(tloja *, int);
 void cadastrar_preco(void);
 void listar_preco(void);
 void consultar_preco(void);
 
 int main()
 {
-	/*Menu principal com looping*/
+	/*Menu principal. Mantém um looping enquanto o usuário quiser continuar*/
 	int op;
 
 	do{
@@ -102,23 +100,22 @@ int main()
 
 void cadastrar_prod()
 {
-	/*Este procedimento cadastra novos produtos no arquivo 'produtos.dat'*/
+	/*Este procedimento cadastra novos produtos*/
 	FILE * pin;
-	int codigo = pegar_cod(fpd, 1);
+	int codigo = pegar_cod(FPD, 1);
 
 	printf("************************************\n");
 	printf("*        CADASTRO DE PRODUTOS      *\n");
 	printf("************************************\n");
 	printf("* Para sair, digite 'sair' na des- *\n");
 	printf("* -cricao                          *\n");
-	if((pin = fopen(fpd, "ab")) == NULL){
-		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", fpd);
+	if((pin = fopen("produtos.dat", "ab")) == NULL){
+		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", FPD);
 		exit(1);
 	}
 	tproduto produto;
 	char descricao[51];
 	int i = 1;
-
 	do{
 		printf("************************************\n");
 		printf("Produto %03d\n", i++);
@@ -128,6 +125,7 @@ void cadastrar_prod()
 		while(getchar() != '\n');
 		if(!strcmp(descricao, "sair"))
 			break;
+		
 		produto.cod = codigo;
 		strcpy(produto.descricao, descricao);
 		fwrite(&produto, sizeof(tproduto), 1, pin);
@@ -136,11 +134,16 @@ void cadastrar_prod()
 	printf("\n");
 }
 
-int pegar_cod(char * arquivo, int num)
+int pegar_cod(const char * arquivo, int num)
 {
-	/*Esta função retorna o código do último item (produto, loja ou preco) cadastrado
-	 *Parâmetro 1: uma string (nome do arquivo a ser manipulado)
-	 *Parâmetro 2: um inteiro (tipo de estrutura que será manipulada)*/
+	/*Esta função retorna o código do último produto cadastrado
+	 *Parametro 1: uma string constante. É o tipo de arquivo que
+	 			   será manipulado.
+	 *Parametro 2: um inteiro. Indica qual será o tipo de arquivo a
+	 			   ser manipulado.
+	 			   Se 1: é do tipo 'tproduto';
+	 			   Se 2: é do tipo 'tloja';
+	 			   Se 3: é do tipo 'tpreco'.*/
 	FILE * pout;
 	int codigo;
 
@@ -149,39 +152,38 @@ int pegar_cod(char * arquivo, int num)
 		exit(1);
 	}
 	fseek(pout, 0, SEEK_END);
-	if(!ftell(pout)){
+		if(!ftell(pout)){
         	fclose(pout);
         	return 0;
 	}
 	switch(num){
         	case 1:
-            		codigo = ftell(pout) / sizeof(tproduto);
+           		codigo = ftell(pout) / sizeof(tproduto);
            		break;
         	case 2:
-            		codigo = ftell(pout) / sizeof(tloja);
-            		break;
-        	case 3:
+          	  	codigo = ftell(pout) / sizeof(tloja);
+           	 	break;
+		case 3:
             		codigo = ftell(pout) / sizeof(tpreco);
             		break;
         	default:
             		fprintf(stderr, "\n\aAlgo deu errado!\n");
 	}
 	fclose(pout);
-
 	return codigo;
 }
 
 void listar_prod()
 {
-	/*Mostra as informações sobre os produtos; baseia-se em ordem alfabética*/
+	/*Este procedimento mostra as informações sobre os produtos; baseia-se em ordem
+	alfabética*/
 	FILE * pout;
-
 	printf("************************************\n");
 	printf("*       LISTAGEM DE PRODUTOS       *\n");
 	printf("************************************\n");
 
-	if((pout = fopen(fpd, "rb")) == NULL){
-		fprintf(stderr, "\n\aErro ao ler o arquivo '%s'!\n", fpd);
+	if((pout = fopen(FPD, "rb")) == NULL){
+		fprintf(stderr, "\n\aErro ao ler o arquivo '%s'!\n", FPD);
 		exit(1);
 	}
 
@@ -190,7 +192,7 @@ void listar_prod()
 	tproduto produtos[tam];
 	rewind(pout);
 	fread(produtos, sizeof(tproduto), tam, pout);
-	ordenar_prod(produtos, tam);
+	ordenar(1, tam, produtos, NULL, NULL);
 	fclose(pout);
 
 	printf("+----------------------------------- --- -- -\n");
@@ -203,26 +205,59 @@ void listar_prod()
 	printf("+-----------+----------------------- --- -- -\n");
 }
 
-void ordenar_prod(tproduto * produtos, int max)
+void ordenar(int num, int max, tproduto * produtos, tloja * lojas, tpreco * precos)
 {
-	/*Ordenação de produtos por ordem alfabética usando Insertion Sort*/
-	register int i, j;
-	tproduto key;
-
-	for(i = 1; i < max; i++){
-		key = produtos[i];
-		j = i-1;
-		while(j >= 0 && strcasecmp(produtos[j].descricao, key.descricao) > 0){
-            		produtos[j+1] = produtos[j];
-            		j--;
-		}
-		produtos[j+1] = key;
+	/*Ordenação por ordem alfabética usando Insertion Sort
+	 *Parametro 1: um inteiro. Indica qual tipo de estrutura será ordenada.
+	 			   Se 1: é do tipo 'tproduto';
+	 			   Se 2: é do tipo'tloja';
+	 			   Se 3: é do tipo'tpreco'.
+	 *Parametro 2: um inteiro. É o tamanho da estrutura a ser ordenada
+	 *Parametro 3: uma estrutura do tipo 'tproduto'. Caso 'num' seja 1,
+	 			   então 'tloja' e 'tpreco' serão igual a 'NULL'. É a estrutura
+	 			   a ser ordenada.
+	 *Parametro 4: uma estrutura do tipo 'tloja'. Caso 'num' seja 2,
+	 			   então 'tproduto' e 'tpreco' serão igual a 'NULL'. É a estrutura
+	 			   a ser ordenada.
+	 *Parametro 5: uma estrutura do tipo 'tpreco'. Caso 'num' seja 3,
+	 			   então 'tproduto' e 'tloja' serão igual a 'NULL'. É a estrutura
+	 			   a ser ordenada.*/
+	if(num == 1){
+        	register int i, j;
+        	tproduto key;
+		for(i = 1; i < max; i++){
+        		key = produtos[i];
+            		j = i-1;
+            		while(j >= 0 && strcasecmp(produtos[j].descricao, key.descricao) > 0){
+				produtos[j+1] = produtos[j];
+                		j--;
+           		}
+           		produtos[j+1] = key;
+        	}
+       		return;
+	}
+	if(num == 2){
+        	register int i, j;
+        	tloja key;
+        	for(i = 1; i < max; i++){
+            		key = lojas[i];
+            		j = i-1;
+            		while(j >= 0 && strcasecmp(lojas[j].nome, key.nome) > 0){
+                		lojas[j+1] = lojas[j];
+                		j--;
+            		}
+           		lojas[j+1] = key;
+        	}
+        	return;
+	}
+	if(num == 3){
+		printf("\nEm construcao\n");
 	}
 }
 
 void alterar_prod()
 {
-	/*Altera a descricao de um produto no arquivo 'produtos.dat'*/
+	/*Este procedimento altera a descrição de um produto*/
 	FILE * pin;
 	int codigo;
 
@@ -235,8 +270,8 @@ void alterar_prod()
 	printf("Codigo do produto: ");
 	scanf("%d", &codigo);
 
-	if((pin = fopen(fpd, "r+b")) == NULL){
-		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", fpd);
+	if((pin = fopen(FPD, "r+b")) == NULL){
+		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", FPD);
 		exit(1);
 	}
 	tproduto produto;
@@ -268,17 +303,17 @@ void alterar_prod()
 
 void cadastrar_loja()
 {
-	/*Este procedimento cadastra novas lojas no arquivo 'lojas.dat'*/
+	/*Este procedimento cadastra novas lojas*/
 	FILE * pin;
-	int codigo = pegar_cod(flj, 2);
+	int codigo = pegar_cod(FLJ, 2);
 
 	printf("************************************\n");
 	printf("*         CADASTRO DE LOJAS        *\n");
 	printf("************************************\n");
 	printf("* Para sair, digite 'sair' no nome *\n");
 	printf("* ou no site                       *\n");
-	if((pin = fopen(flj, "ab")) == NULL){
-		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", flj);
+	if((pin = fopen(FLJ, "ab")) == NULL){
+		fprintf(stderr, "\n\aErro ao abrir '%s'!\n", FLJ);
 		exit(1);
 	}
 	tloja loja;
@@ -311,15 +346,16 @@ void cadastrar_loja()
 
 void listar_loja()
 {
-	/*Mostra as informações sobre as lojas; baseia-se em ordem alfabética dos nomes*/
+	/*Este procedimento mostra as informações sobre as lojas; baseia-se em ordem
+	alfabética dos nomes*/
 	FILE * pout;
 
 	printf("************************************\n");
 	printf("*        LISTAGEM DE LOJAS         *\n");
 	printf("************************************\n");
 
-	if((pout = fopen(flj, "rb")) == NULL){
-		fprintf(stderr, "\n\aErro ao ler o arquivo '%s'!\n", flj);
+	if((pout = fopen(FLJ, "rb")) == NULL){
+		fprintf(stderr, "\n\aErro ao ler o arquivo '%s'!\n", FLJ);
 		exit(1);
 	}
 
@@ -328,11 +364,10 @@ void listar_loja()
 	tloja lojas[tam];
 	rewind(pout);
 	fread(lojas, sizeof(tloja), tam, pout);
-	ordenar_loja(lojas, tam);
+	ordenar(2, tam, NULL, lojas, NULL);
 	fclose(pout);
 
 	char white[] = "                                        ";
-
 	printf("+-----------+-----------------------------------------+--------------- -- -\n");
 	printf("|Codigo     |Nome                                     | Site               \n");
 	printf("+-----------+-----------------------------------------+--------------- -- -\n");
@@ -341,23 +376,6 @@ void listar_loja()
         	printf("|%010d |%s %s|%s\n", lojas[i].cod, lojas[i].nome, &white[strlen(lojas[i].nome)], lojas[i].site);
 	}
 	printf("+-----------+-----------------------------------------+--------------- -- -\n");
-}
-
-void ordenar_loja(tloja * lojas, int max)
-{
-	/*Ordenação das lojas por ordem alfabética usando Insertion Sort*/
-	register int i, j;
-	tloja key;
-
-	for(i = 1; i < max; i++){
-		key = lojas[i];
-		j = i-1;
-		while(j >= 0 && strcasecmp(lojas[j].nome, key.nome) > 0){
-            		lojas[j+1] = lojas[j];
-            		j--;
-		}
-		lojas[j+1] = key;
-	}
 }
 
 void cadastrar_preco()
