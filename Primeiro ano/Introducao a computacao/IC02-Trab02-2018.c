@@ -31,11 +31,11 @@ typedef struct {
 //PROTÓTIPOS:						//SITUAÇÃO:
 void cadastrar_prod(void);				//FINALIZADO
 int pegar_cod(const char *, int);			//FINALIZADO
-void listar_prod(void);					//FINALIZADO
+void listar_prod(void);				//FINALIZADO
 void ordenar(int, int, tproduto *, tloja *, tpreco *);  //EM CONSTRUÇÃO
 void alterar_prod(void);				//FINALIZADO
 void cadastrar_loja(void);				//FINALIZADO
-void listar_loja(void);					//FINALIZADO
+void listar_loja(void);				//FINALIZADO
 void cadastrar_preco(void);				//A FAZER
 void listar_preco(void);				//EM CONSTRUÇÃO
 void consultar_preco(void);				//A FAZER
