@@ -34,12 +34,12 @@ typedef struct {
 void cadastrar_prod(void);								//FINALIZADO
 int pegar_cod(const char *, int);							//FINALIZADO
 void listar_prod(void);									//FINALIZADO
-void ordenar(int, int, tproduto *, tloja *, tpreco *);					//EM CONSTRUÇÃO
+void ordenar(int, int, tproduto *, tloja *, tpreco *);  				//FINALIZADO
 void alterar_prod(void);								//FINALIZADO
 void cadastrar_loja(void);								//FINALIZADO
 void listar_loja(void);									//FINALIZADO
 void cadastrar_preco(void);								//FINALIZADO
-void listar_preco(void);								//EM CONSTRUÇÃO
+void listar_preco(void);								//FINALIZADO
 void consultar_preco(void);								//A FAZER
 
 int main()
@@ -95,6 +95,7 @@ int main()
 		printf("\n");
 	}while(op != 0);
 	printf("\nFim de execucao\n");
+
 	return 0;
 }
 
@@ -116,6 +117,7 @@ void cadastrar_prod()
 	tproduto produto;
 	char descricao[51];
 	int i = 1;
+
 	do{
 		printf("************************************\n");
 		printf("Produto %03d\n", i++);
@@ -153,23 +155,24 @@ int pegar_cod(const char * arquivo, int num)
 	}
 	fseek(pout, 0, SEEK_END);
 	if(!ftell(pout)){
-		fclose(pout);
-		return 0;
+        	fclose(pout);
+        	return 0;
 	}
 	switch(num){
-		case 1:
-			codigo = ftell(pout) / sizeof(tproduto);
-			break;
-		case 2:
-			codigo = ftell(pout) / sizeof(tloja);
-			break;
-		case 3:
-			codigo = ftell(pout) / sizeof(tpreco);
-			break;
-		default:
-			fprintf(stderr, "\n\aAlgo deu errado!\n");
+        case 1:
+            codigo = ftell(pout) / sizeof(tproduto);
+            break;
+        case 2:
+            codigo = ftell(pout) / sizeof(tloja);
+            break;
+        case 3:
+            codigo = ftell(pout) / sizeof(tpreco);
+            break;
+        default:
+            fprintf(stderr, "\n\aAlgo deu errado!\n");
 	}
 	fclose(pout);
+
 	return codigo;
 }
 
@@ -201,7 +204,7 @@ void listar_prod()
 	printf("+-----------+----------------------- --- -- -\n");
 	for(i = 0; i < tam; i++){
         	printf("+-----------+----------------------- --- -- -\n");
-        	printf("|%010d |%s\n", produtos[i].cod, produtos[i].descricao);
+       		printf("|%010d |%s\n", produtos[i].cod, produtos[i].descricao);
 	}
 	printf("+-----------+----------------------- --- -- -\n");
 }
@@ -221,8 +224,8 @@ void ordenar(int num, int max, tproduto * produtos, tloja * lojas, tpreco * prec
 	 		então 'tproduto' e 'tpreco' serão igual a 'NULL'. É a estrutura
 	 		a ser ordenada.
 	 *Parametro 5: uma estrutura do tipo 'tpreco'. Caso 'num' seja 3,
-	 		'tloja' receberá a struct e então 'tproduto' será 
-			'NULL'. É a estrutura a ser ordenada.*/
+	 		então 'tproduto' será igual a 'NULL', 'tpreco' recebe uma estrutura. 
+			É a estrutura ser ordenada.*/
 
 	if(num == 1){
 		register int i, j;
@@ -236,7 +239,7 @@ void ordenar(int num, int max, tproduto * produtos, tloja * lojas, tpreco * prec
 			}
 			produtos[j+1] = key;
 		}
-        return;
+		return;
 	}
 	if(num == 2){
 		register int i, j;
@@ -253,9 +256,9 @@ void ordenar(int num, int max, tproduto * produtos, tloja * lojas, tpreco * prec
 		return;
 	}
 	if(num == 3){
+		register int i, j;
 		int tam_loja = pegar_cod(FLJ, 2);
 		int indice;
-		register int i, j;
 		tpreco key;
 		for(indice = 0; indice < tam_loja; indice++) {
 			for(i = 1; i < max; i++){
@@ -265,7 +268,7 @@ void ordenar(int num, int max, tproduto * produtos, tloja * lojas, tpreco * prec
 					precos[j+1] = precos[j];
 					j--;
 				}
-			precos[j+1] = key;
+				precos[j+1] = key;
 			}
 		}
 		return;
@@ -390,8 +393,8 @@ void listar_loja()
 	printf("|Codigo     |Nome                                     | Site               \n");
 	printf("+-----------+-----------------------------------------+--------------- -- -\n");
 	for(i = 0; i < tam; i++){
-        	printf("+-----------+-----------------------------------------+--------------- -- -\n");
-        	printf("|%010d |%s %s|%s\n", lojas[i].cod, lojas[i].nome, &white[strlen(lojas[i].nome)], lojas[i].site);
+		printf("+-----------+-----------------------------------------+--------------- -- -\n");
+		printf("|%010d |%s %s|%s\n", lojas[i].cod, lojas[i].nome, &white[strlen(lojas[i].nome)], lojas[i].site);
 	}
 	printf("+-----------+-----------------------------------------+--------------- -- -\n");
 }
@@ -439,7 +442,6 @@ void cadastrar_preco()
 			if(cod_loja < 0)
 				return;
 		}
-		/*EM ANÁLISES*/
 		fseek(pin, 0, SEEK_END);
 		tam = ftell(pin)/sizeof(tpreco);
 		tpreco preco2;
@@ -451,8 +453,9 @@ void cadastrar_preco()
 				break;
 			}
 		}
-		if(preco2.cod_produto == cod_produto && preco2.cod_loja == cod_loja)
+		if(preco2.cod_produto == cod_produto && preco2.cod_loja == cod_loja){
 			continue;
+		}
 		printf("Preco: R$ ");
 		scanf("%f", &valor);
 		if(valor < 0)
@@ -470,14 +473,13 @@ void listar_preco()
 {
 	/*Este procedimento mostra as informações sobre os precos; baseia-se em ordem
 	alfabética dos nomes*/
-	/*FALTA ACABAR. PRECISA PEGAR INFORMAÇÕES SOBRE OS PRODUTOS*/
 	FILE * pout;
 
 	printf("************************************\n");
 	printf("*       LISTAGEM DOS PRECOS         *\n");
 	printf("************************************\n");
 
-	//lojas
+	//Obtenção dos dados das lojas
 	if((pout = fopen(FLJ, "rb")) == NULL){
 		fprintf(stderr, "\n\aErro ao abrir '%s'!\nTalvez ele esteja vazio!\n", FLJ);
 		return;
@@ -491,6 +493,7 @@ void listar_preco()
 	fclose(pout);
 	ordenar(2, tam, NULL, lojas, NULL);
 
+	//Obtenção dos dados dos precos
 	if((pout = fopen(FPC, "rb")) == NULL){
 		fprintf(stderr, "\n\aErro ao abrir '%s'!\nTalvez ele esteja vazio!\n", FPC);
 		return;
@@ -503,15 +506,36 @@ void listar_preco()
 	fread(precos, sizeof(tpreco), tam2, pout);
 	fclose(pout);
 	ordenar(3, tam2, NULL, lojas, precos);
-	register int i, j;
 
+	//Obtenção dos dados dos produtos
+	if((pout = fopen(FPD, "rb")) == NULL){
+		fprintf(stderr, "\n\aErro ao abrir '%s'!\nTalvez ele esteja vazio!\n", FPD);
+		return;
+	}
+
+	fseek(pout, 0, SEEK_END);
+	int tam3 = ftell(pout)/sizeof(tproduto);
+	tproduto produtos[tam3];
+	rewind(pout);
+	fread(produtos, sizeof(tproduto), tam3, pout);
+	fclose(pout);
+
+	register int i, j;
+	char white[] = "                                         ";
+	printf("+------------------------------------------------------------------------------- -- -\n");
+	printf("|Nome da loja                             |Preco do produto|Descricao do produto     \n");
+	printf("+-----------------------------------------+----------------+-------------------- -- -\n");
 	for(i = 0; i < tam; i++){
-		printf("Nome loja: %s\n", lojas[i].nome);
+		printf("+-----------------------------------------+----------------+-------------------- -- -\n");
+		printf("|%s%s|%s|\n", lojas[i].nome, &white[strlen(lojas[i].nome)], &white[25]);
 		for(j = 0; j < tam2; j++){
-			if(lojas[i].cod == precos[j].cod_loja)
-				printf("\t   Preco: R$ %.2f\n\n", precos[j].preco);
+			if(lojas[i].cod == precos[j].cod_loja){
+				printf("|%s|................+.................... .. .\n", white);
+				printf("|%s|R$%.2f\t   |%s\n", white, precos[j].preco, produtos[precos[j].cod_produto - 1].descricao);
+			}
 		}
 	}
+	printf("+------------------------------------------------------------------------------- -- -\n");
 }
 
 void consultar_preco()
