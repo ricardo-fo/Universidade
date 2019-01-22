@@ -6,6 +6,9 @@
  * Ricardo Oliveira  | C.C.
  * Professor: Ciro Cirne Trindade
 */
+
+/*UPDATE - RICARDO OLIVERIA:
+ *AINDA ESTOU ARRUMANDO ALGUNS DETALHES DE EXIBIÇÃO*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,9 +42,9 @@ void alterar_prod(void);								//FINALIZADO
 void cadastrar_loja(void);								//FINALIZADO
 void listar_loja(void);									//FINALIZADO
 void cadastrar_preco(void);								//FINALIZADO
-void listar_preco(void);								//FINALIZADO - DA PARA MELHORAR
-void consultar_preco(void);								//FINALIZADO - DA PARA MELHORAR
-void printar_linha(int, int);
+void listar_preco(void);								//FINALIZADO
+void consultar_preco(void);								//FINALIZADO
+void printar_linha(int, int);							//FINALIZADO
 
 int main()
 {
@@ -160,8 +163,8 @@ int pegar_cod(const char * arquivo, int num)
 	}
 	switch(num){
         	case 1:
-			codigo = ftell(pout) / sizeof(tproduto);
-			break;
+				codigo = ftell(pout) / sizeof(tproduto);
+				break;
         	case 2:
            		codigo = ftell(pout) / sizeof(tloja);
            		break;
@@ -199,7 +202,7 @@ void listar_prod()
 	ordenar(1, tam, produtos, NULL, NULL);
 	fclose(pout);
 
-	register int maior = 11;
+	register int maior = 11;//strlen(" Descricao") + 1
 	for(i = 0; i < tam; i++){
 		if(strlen(produtos[i].descricao) > maior){
 			maior = strlen(produtos[i].descricao) + 1;
@@ -222,6 +225,12 @@ void listar_prod()
 }
 
 void printar_linha(int maior, int tipo){
+	/*Este procedimento printa ou uma linha ou o caractere '|', este indica o fim de uma linha.
+	 *Argumentos: int maior - é o strlen() da maior palavra encontrada
+	 			  int tipo - é o tipo de linha a ser printada (linha comum ou fim de linha)
+	 *Tipos de linha: 1 - indica uma linha comum;
+	 				  outro valor: imprime o indicador de fim de linha, '|'
+	*/
 	register int j = 0;
 	if(tipo == 1){
 		putchar('+');
@@ -422,7 +431,7 @@ void listar_loja()
 	fclose(pout);
 	char white[] = "                                        ";
 
-	register int maior = 5;
+	register int maior = 5;//strlen("Site") + 1
 	for(i = 0; i < tam; i++){
 		if(strlen(lojas[i].site) > maior){
 			maior = strlen(lojas[i].site) + 1;
@@ -524,7 +533,7 @@ void listar_preco()
 	printf("*       LISTAGEM DOS PRECOS        *\n");
 	printf("************************************\n");
 
-	//lojas
+	//Lê as informações sobre as lojas
 	if((pout = fopen(FLJ, "rb")) == NULL){
 		fprintf(stderr, "\n\aErro ao abrir '%s'!\nTalvez ele esteja vazio!\n", FLJ);
 		return;
@@ -538,7 +547,7 @@ void listar_preco()
 	fclose(pout);
 	ordenar(2, tam, NULL, lojas, NULL);
 
-	//preços
+	//Lê as informações sobre os preços
 	if((pout = fopen(FPC, "rb")) == NULL){
 		fprintf(stderr, "\n\aErro ao abrir '%s'!\nTalvez ele esteja vazio!\n", FPC);
 		return;
@@ -552,7 +561,7 @@ void listar_preco()
 	fclose(pout);
 	ordenar(3, tam2, NULL, lojas, precos);
 
-	//produtos
+	//Lê as informações sobre os produtos
 	if((pout = fopen(FPD, "rb")) == NULL){
 		fprintf(stderr, "\n\aErro ao abrir '%s'!\nTalvez ele esteja vazio!\n", FPD);
 		return;
@@ -564,8 +573,11 @@ void listar_preco()
 	rewind(pout);
 	fread(produtos, sizeof(tproduto), tam3, pout);
 	fclose(pout);
-	register int i, j, maior = 22;
+
+	register int i, j, maior = 22;//strlen("Descricao do produto") + 1
 	char white[] = "                                         ";
+
+	//Define o tamanho à direita da tabela
 	for(i = 0; i < tam3; i++){
 		if(strlen(produtos[i].descricao) > maior){
 			for(j = 0; j < tam2; j++){
@@ -575,36 +587,42 @@ void listar_preco()
 			}
 		}
 	}
+
+	//Printa a tabela
 	printf("+-----------------------------------------+------------------");
 	printar_linha(maior, 1);
 	printf("|Nome da loja                             | Preco do produto | Descricao do produto");
 	printar_linha(maior, strlen("Descricao do produto"));
 	printf("+-----------------------------------------+------------------");
 	printar_linha(maior, 1);
+	//Printa o nome das lojas em ordem alfabética
 	for(i = 0; i < tam; i++){
 		printf("+-----------------------------------------+------------------");
 		printar_linha(maior, 1);
 		printf("|%s%s|", lojas[i].nome, &white[strlen(lojas[i].nome)]);
-		int controle = 1;
+		int controle = 1, nao_nulo = 0;
+		//Printa os preços e descrições dos produtos correspondentes à loja
 		for(j = 0; j < tam2; j++){
 			if(lojas[i].cod == precos[j].cod_loja){
-				if(controle){
-					if(!strlen(produtos[precos[j].cod_produto - 1].descricao)){
-					printf("\nstrlen == 0\n");
-					}
+				nao_nulo = 1;
+				if(controle){//Formata e printa a primeira linha de preço e descrição
 					printf(" R$%.2f\t     | %s", precos[j].preco, produtos[precos[j].cod_produto - 1].descricao);
 					printar_linha(maior, strlen(produtos[precos[j].cod_produto - 1].descricao));
 					controle = 0;
 					continue;
 				}
+				//Printa o restante das linhas de preços e descrições
 				printf("|%s|------------------", white);
 				printar_linha(maior, 1);
-				if(strlen(produtos[precos[j].cod_produto - 1].descricao) == 1){
-					printf("\nstrlen == 1\n");
-				}
 				printf("|%41s| R$%.2f\t     | %s", " ", precos[j].preco, produtos[precos[j].cod_produto - 1].descricao);
 				printar_linha(maior, strlen(produtos[precos[j].cod_produto - 1].descricao));
 			}
+		}
+		//Printa os produtos que não estão cadastrados em nenhuma loja
+		if(!nao_nulo){
+			printf("\t\t     | ");
+			printar_linha(maior, 0);
+			continue;
 		}
 		printf("|%s|------------------", white);
 		printar_linha(maior, 1);
@@ -674,21 +692,42 @@ void consultar_preco()
 			if(codigo < 0)
 				return;
 		}
-		printf("+----------------------------------------------------------------------------------------------- -- -\n");
-		printf("|Descricao do produto                              |Preco(s) do produto|Nome da loja                 \n");
-		printf("+--------------------------------------------------+-------------------+------------------------ -- -\n");
-		printf("|%s%s|                   |\n", produtos[codigo - 1].descricao, &white[strlen(produtos[codigo - 1].descricao)]);
-		register int i = 0;
-		int a = 1;
+
+		register int i, maior = 14;//strlen(" Nome da loja") + 1
+		for(i = 0; i < tam3; i++){
+			if(strlen(lojas[i].nome) > maior){
+				maior = strlen(lojas[i].nome) + 1;
+			}
+		}
+
+		printf("+--------------------------------------------------+---------------------");
+		printar_linha(maior, 1);
+		printf("| Descricao do produto                             | Preco(s) do produto | Nome da loja");
+		printar_linha(maior, strlen("Nome da loja"));
+		printf("+--------------------------------------------------+---------------------");
+		printar_linha(maior, 1);
+		printf("|%s%s|", produtos[codigo - 1].descricao, &white[strlen(produtos[codigo - 1].descricao)]);
+		int controle = 1, a = 1;
+		i = 0;
 		while(i < tam2){
 			if(precos[i].cod_produto == codigo){
 				a = 0;
-				printf("|                                                  |-------------------+------------------------ -- -\n");
-				printf("|%s|R$ %.2f\t       |%s\n", white, precos[i].preco, lojas[precos[i].cod_loja - 1].nome);
+				if(controle){
+					printf(" R$ %.2f  \t         | %s", precos[i].preco, lojas[precos[i].cod_loja - 1].nome);
+					printar_linha(maior, strlen(lojas[precos[i].cod_loja - 1].nome));
+					controle = 0;
+					i++;
+					continue;
+				}
+				printf("|%s|---------------------", white);
+				printar_linha(maior, 1);
+				printf("|%s| R$ %.2f\t         | %s", white, precos[i].preco, lojas[precos[i].cod_loja - 1].nome);
+				printar_linha(maior, strlen(lojas[precos[i].cod_loja - 1].nome));
 			}
 			i++;
 		}
-		printf("+----------------------------------------------------------------------------------------------- -- -\n");
+		printf("+--------------------------------------------------+---------------------");
+		printar_linha(maior, 1);
 		if(a)
 			fprintf(stderr, "\n\aNao ha' precos cadastrados para esse produto!\n");
 	}while(codigo > 0);
