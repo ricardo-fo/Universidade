@@ -1,0 +1,67 @@
+IHC-I - AULA II - 18/02/2019
+
+.bot-chato-word {
+	ficava dando dicas e foi extinto;
+}
+
+.ferramentas {
+	IDE's: "aumenta a produtividade",
+		"produzir um código";
+
+	sucesso da inteação ~ conhecimento do usuário; 
+}
+
+.midia {
+	interação == comunicar;
+	interação[]: (sistemas colaborativos, chats, sistemas de relacionamentos, 
+		      redes sociais);
+}
+
+.interface {
+	carac[]: (sistema com que o usuário mantém contato físico,
+		  usuários acreditam que a interface É o sistema,
+		  envolve hardware e software);
+}
+
+.affordance {
+	carac[]: (potencial da interface em ser usada como ela foi projetada,
+		  objetivo final de um design de interface, existem padrões, 
+		  aparece com o decorrer do temp);
+}
+
+********************************************************************************
+* ATIVIDADE 1/2								       *
+********************************************************************************
+SISTEMAS:
+
+1- ZAPZAP
+CONTEXTO: 
+SMARTPHONE - GRUPO DE FACULDADE
+
+OBJETIVO:
+COMUNICAÇÃO, TRANSFERÊNCIA DE MÍDIA, ESPALHAR FAKE NEWS
+
+TIPO DE INTERAÇÃO:
+MÍDIA
+
+AFFORDANCE:
+LUPA, ANEXAR(CLIP), EMOJI, CAMÊRA, TRÊS PONTOS, AUDIO
+
+2 - Code::Blocks
+CONTEXTO:
+COMPUTADOR
+
+OBJETIVO:
+APRENDER, DESENVOLVER, PROGRAMAR
+
+TIPO DE INTERAÇÃO:
+FERRAMENTA
+
+AFFORDANCE:
+PASTA, DISQUETE, FOLHA, FECHAR (X), MAXIMIZAR (QUADRADO), RUN (TRIÂNGULO), CAMPO DE PESQUISA
+
+TIPOS DE INTERAÇÃO:
+PERSPECTIVA DE SISTEMA
+MÍDIA
+FERRAMENTA
+PARCEIRO DE DISCURSO
