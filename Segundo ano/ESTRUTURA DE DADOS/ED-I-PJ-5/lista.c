@@ -1,6 +1,8 @@
 /* lista.c */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "lista.h"
 
 void lst_init(lista * l)
@@ -39,11 +41,10 @@ bool lst_inserir(lista * l, int k, lst_info val) {
 	return false;
 }
 
-bool lst_remover(lista * l, int k, lst_info * val)
+bool lst_remover(lista * l, int k)
 {
 	if (k >= 0 && k < l->n) {
 		int i;
-		*val = l->itens[k];
 		for (i = k + 1; i < l->n; i++) {
 			l->itens[i - 1] = l->itens[i];
 		}
@@ -59,10 +60,11 @@ void lst_imprimir(lista l)
 
 	register int i;	
 
+	printf("[");
 	for(i = 0; i < l.n; i++){
-		printf("\nPosição: %d\nValor: %d\n", i, l.itens[i]);
-		printf("-------");
+		printf("%d, ", l.itens[i]);
 	}
+	printf("\b\b]\n");
 }
 
 int lst_procurar(lista l, lst_info val)
@@ -86,27 +88,31 @@ bool lst_ins_ordenado(lista * l, lst_info val)
 	lst_ordenar(l);
 
 	register int i, k;
-
+	
 	if(val > 0){
-		for(i = val; ;i++){
+		for(i = val; i < l->n; i++){
 			if((k = lst_procurar(*l, i)) != -1){
-				break;
+				lst_inserir(l, k, val);
+				lst_ordenar(l);
+				return true;
 			}
 		}
+		lst_inserir(l, l->n - 1, val);
+		lst_ordenar(l);
+		return true;
 	} else {
-		for(i = val; ;i--){
+		for(i = val; i > -1*(l->n); i--){
 			if((k = lst_procurar(*l, i)) != -1){
-				break;
+				lst_inserir(l, k, val);
+				lst_ordenar(l);
+				return true;
 			}
 		}
-	}
-		
-
-	if(lst_inserir(l, k, val)){
+		lst_inserir(l, 0, val);
+		lst_ordenar(l);
 		return true;
 	}
-	return false;
-	
+	return false;	
 }
 
 void lst_ordenar(lista * l)
@@ -122,6 +128,86 @@ void lst_ordenar(lista * l)
 			}
 		}
 	}
+}
+
+bool lst_inserir_final(lista * l, lst_info x)
+{
+	if(l->n == LST_MAX) return false;
+	
+	return (lst_inserir(l, l->n-1, x));
+}
+
+bool lst_inserir_inicio(lista * l, lst_info x)
+{
+	if(l->n == LST_MAX) return false;
+	
+	return (lst_inserir(l, 0, x));
+}
+
+bool lst_remover_final(lista * l, lst_info * x)
+{
+	if(l->n == 0) return false;
+
+	return (lst_remover(l, l->n-1));
+}
+
+bool lst_remover_inicio(lista * l, lst_info * x)
+{
+	if(l->n == 0) return false;
+
+	return (lst_remover(l, 0));
+}
+
+bool lst_gerar(lista * l, int nos, int max)
+{
+	if(nos > LST_MAX) return false;
+
+	srand(time(NULL));
+
+	register int i;
+
+	for(i = 0; i < nos; i++){
+		lst_inserir(l, i, ((rand() % max) + 1));
+	}
+	l->n = nos;
+
+	return true;
+}
+
+bool lst_ordenada(lista l)
+{
+	register int i;
+
+	for(i = 0; i < l.n; i++){
+		if(l.itens[i] > l.itens[i+1])
+			return false;
+	}
+	return true;
+}
+
+int lst_remover_menores(lista * l, lst_info x)
+{
+	/* NECESSITA DE AJUSTES */
+	register int i, j, k, cont = 0;
+
+	lst_ordenar(l);	
+
+	for(i = 0; i < l->n; i++){
+		if(l->itens[i] < x){
+			cont++;
+			k = i;
+			for(j = i + 1; j < l->n; j++){
+				if(l->itens[j] >= x){
+					l->itens[k++] = l->itens[j];
+				} else {
+					cont++;
+				}
+			}
+		}
+	}
+	l->n -= cont;
+
+	return cont;
 }
 
 

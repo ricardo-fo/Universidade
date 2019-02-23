@@ -17,6 +17,13 @@ int main()
 		printf("<5> Mostrar tudo\n");
 		printf("<6> Buscar\n");
 		printf("<7> Inserir com ordenação\n");
+		printf("<8> Inserir final\n");
+		printf("<9> Inserir início\n");
+		printf("<10> Remover final\n");
+		printf("<11> Remover início\n");
+		printf("<12> Gerar lista\n");
+		printf("<13> Ordenada?\n");
+		printf("<14> Remover menores\n");
 		printf("<0> Sair\n");
 		printf("Opção: ");
 		scanf("%d", &op);
@@ -78,17 +85,77 @@ int main()
 				if((k = lst_procurar(l, val)) != -1){
 					printf("\nElemento encontrado!\nPosição: %d\nValor: %d\n", k, val);
 					break;
+				} else {
+					printf("\nElemento não encontrado!\n");
 				}
-				printf("\nElemento não encontrado!\n");
 				break;
 			case 7:
 				printf("Valor: ");
 				scanf("%d", &val);
 				if((k = lst_ins_ordenado(&l, val))){
 					printf("\nElemento inserido com sucesso!\n");
-					break;
+				} else {
+					printf("\nErro: elemento não inserido!\n");
 				}
-				printf("\nErro: elemento não inserido!\n");
+				break;
+			case 8:
+				printf("Valor: ");
+				scanf("%d", &val);
+				if(lst_inserir_final(&l, val)) {
+					printf("Elemento inserido com sucesso!\n");
+				} else {
+					printf("\nErro: elemento não inserido!\n");
+				}
+				break;
+			case 9:
+				printf("Valor: ");
+				scanf("%d", &val);
+				if(lst_inserir_inicio(&l, val)) {
+					printf("Elemento inserido com sucesso!\n");
+				} else {
+					printf("\nErro: elemento não inserido!\n");	
+				}
+				break;
+			case 10:
+				printf("Valor: ");
+				scanf("%d", &val);
+				if(lst_remover_final(&l, &val)){
+					printf("Último elemento removido com sucesso!\n");
+				} else {
+					printf("Falha ao remover último elemento!\n");
+				}	
+				break;
+			case 11:
+				printf("Valor: ");
+				scanf("%d", &val);
+				if(lst_remover_inicio(&l, &val)){
+					printf("Primeiro elemento removido com sucesso!\n");
+				} else {
+					printf("Falha ao remover primeiro elemento!\n");
+				}
+				break;
+			case 12:
+				printf("Quantidade de nós: ");
+				scanf("%d", &k);
+				printf("Valor máximo: ");
+				scanf("%d", &val);
+				if(lst_gerar(&l, k, val)){
+					printf("Lista gerada com sucesso!\n");
+				} else {
+					printf("Falha ao gerar a lista!\n");
+				}
+				break;
+			case 13:
+				if(lst_ordenada(l)) {
+					printf("A lista está ordenada!\n");
+				} else {
+					printf("A lista não está ordenada!\n");
+				}
+				break;
+			case 14:
+				printf("Valor: ");
+				scanf("%d", &val);
+				printf("Itens removidos: %d\n", lst_remover_menores(&l, val));
 				break;
 			case 0:
 				break;

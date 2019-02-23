@@ -6,3 +6,9 @@ main.o: main.c lista.h
 	
 lista.o: lista.c lista.h
 	gcc -c lista.c		
+
+run:
+	./lista_linear
+
+clean:
+	rm -rf *.o
