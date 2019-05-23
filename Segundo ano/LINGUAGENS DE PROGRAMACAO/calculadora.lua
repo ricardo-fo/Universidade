@@ -1,7 +1,7 @@
 #!/usr/local/bin/lua
---[[ calculadora_lua.lua
+--[[ calculadora.lua
 * Este programa representa uma calculadora simplificada. Executa as 4
-* operações básicas da aritmética, i.e. somar, subtrair, multiplicar e somar.
+* operações básicas da aritmética, i.e. somar, subtrair, multiplicar e dividir.
 *
 * Grupo: Paradigma imperativo em linguagem de programação Lua.
 * Disciplina: Linguagens de Programação.
@@ -10,32 +10,32 @@
 ]]--
 
 -- Função que soma dois valores.
--- Parâmetros: 'a' e 'b'-> números decimais.
--- Saída: soma dos valores 'a' e 'b'.
+-- Parâmetros: 'a' e 'b'-> números.
+-- Saída: soma dos valores 'a' e 'b' (a + b).
 function somar(valor_a, valor_b)
 	local resultado = valor_a + valor_b
 	return resultado
 end
 
 -- Função que subtrai dois valores.
--- Parâmetros: 'a' e 'b'-> números decimais.
--- Saída: subtração dos valores 'a' e 'b'.
+-- Parâmetros: 'a' e 'b'-> números.
+-- Saída: subtração do valor 'b' do valor 'a' (a - b).
 function subtrair(valor_a, valor_b)
 	local resultado = valor_a - valor_b
 	return resultado
 end
 
 -- Função que multiplica dois valores.
--- Parâmetros: 'a' e 'b'-> números decimais.
--- Saída: multiplicação dos valores 'a' e 'b'.
+-- Parâmetros: 'a' e 'b'-> números.
+-- Saída: multiplicação dos valores 'a' e 'b' (a * b).
 function multiplicar(valor_a, valor_b)
 	local resultado = valor_a * valor_b
 	return resultado
 end
 
 -- Função que divide dois valores.
--- Parâmetros: 'a' e 'b'-> números decimais.
--- Saída: divisão dos valores 'a' e 'b'.
+-- Parâmetros: 'a' e 'b'-> números.
+-- Saída: divisão do valor 'a' pelo valor 'b' (a / b).
 function dividir(valor_a, valor_b)
 	local resultado = valor_a / valor_b
 	return resultado
@@ -43,7 +43,6 @@ end
 
 -- Menu usando um laço de repetição.
 repeat
-	valor_invalido = false
 	print("----------------------------------------------------")
 
 	-- Leitura do primerio valor do teclado -> variável global.
@@ -54,7 +53,7 @@ repeat
 	end
 	-- Conversão da leitura do teclado(string) para um valor numérico.
 	valor_a = tonumber(valor_a)
-	-- Caso o usuário informe um valor 'a' não seja numérico.
+	-- Caso o usuário informe um valor 'a' que não seja numérico.
 	if valor_a == nil then
 		print("\nInforme apenas valores numericos.\n")
 	else
@@ -66,7 +65,7 @@ repeat
 		end
 		-- Conversão da leitura do teclado(string) para um valor numérico.
 		valor_b = tonumber(valor_b)
-		-- Caso o usuário informe um valor 'b' não seja numérico.
+		-- Caso o usuário informe um valor 'b' que não seja numérico.
 		if valor_b == nil then
 			print("\nInforme apenas valores numericos.\n")
 		else
