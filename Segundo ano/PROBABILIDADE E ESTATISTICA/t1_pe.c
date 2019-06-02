@@ -10,25 +10,33 @@
 */
 #include <stdio.h> // uso: inptus e outputs.
 #include <stdlib.h> // uso: fprintf(); fscanf();
-#include <string.h> // uso: strcat(); strcmp(); strrchr(); strtok();
+#include <string.h> // uso: strcat(); strcmp(); strrchr(); strtok(); strcpy(); strlen(); strrev();
 #include <stdbool.h> // uso: true e false;
+#include <math.h> // uso: log10();
 
+// Opções do menu
 void calcular_arquivo_existente(void);
 void criar_arquivo_novo(void);
 
+// Manipulação dos arquivos
 int quantidade_valores(FILE *, const char *);
-void inserir_nome_arquivo(char[]);
+void inserir_nome_arquivo(char []);
 FILE * abrir_arquivo(const char *, const char *);
-void coletar_dados(int, double [*], double [*], FILE *, const char *, const char *);
-
+void coletar_dados(int, double [], double [], FILE *, const char *, const char *, char [][*], char [][*]);
 void validar_extensao(char *, const char *);
 void inserir_dados(FILE *);
 
-double media(int, double [*]);
-double moda(int, double [*]);
+// Estatística
+double media(int, double []);
+double moda(int, double []);
+void tabela_frequencias(int, double [], int);
+void encontrar_frequencias(int, double [], int, double [], int []);
 
-int maior_valor(int, double vetor[*]);
-int menor_valor(int, double vetor[*]);
+// Ferramentas
+int maior_valor(int, double []);
+int menor_valor(int, double []);
+int quantidade_casas_decimais(int, char [][21]);
+double arredondar(double, int);
 
 int main()
 {
@@ -90,14 +98,29 @@ void calcular_arquivo_existente()
     scanf(" %1s", separador);
     while((buffer = getchar()) != '\n');
 
-    int size = quantidade_valores(p_arquivo, separador);
-    double vetor_a[size], vetor_b[size];
+    printf("\n============================================================\n");
 
-    coletar_dados(size, vetor_a, vetor_b, p_arquivo, nome_arquivo, separador);
+    int aux;
+    int size = quantidade_valores(p_arquivo, separador);
+    double vetor_a[size];
+    double vetor_b[size];
+    char vetor_string_a[size][21];
+    char vetor_string_b[size][21];
+
+    coletar_dados(size, vetor_a, vetor_b, p_arquivo, nome_arquivo, separador, vetor_string_a, vetor_string_b);
+    fclose(p_arquivo);
 
     printf("Media dos valores do vetor A: %lf\n", media(size, vetor_a));
     printf("Moda do vetor A: %lf\n", moda(size, vetor_a));
-    fclose(p_arquivo);
+
+    int casas_decimais = quantidade_casas_decimais(size, vetor_string_a);
+    tabela_frequencias(size, vetor_a, casas_decimais);
+    /*if((aux = quantidade_casas_decimais(size, vetor_string_b)) > casas_decimais){
+        casas_decimais = aux;
+    }
+
+    calcular_faixa_valores(size, vetor_b, casas_decimais);*/
+    printf("\n============================================================\n");
 }
 
 void inserir_nome_arquivo(char nome_arquivo[])
@@ -134,7 +157,7 @@ int quantidade_valores(FILE * p_arquivo, const char * separador)
     return contador;
 }
 
-void coletar_dados(int size, double vetor_a[size], double vetor_b[size], FILE * p_arquivo, const char * nome_arquivo, const char * separador)
+void coletar_dados(int size, double vetor_a[], double vetor_b[], FILE * p_arquivo, const char * nome_arquivo, const char * separador, char vetor_string_a[][21], char vetor_string_b[][21])
 {
     char linha[22], * token;
     int i = 0, j = 0;
@@ -146,13 +169,14 @@ void coletar_dados(int size, double vetor_a[size], double vetor_b[size], FILE * 
             fprintf(stderr, "\nERRO: '%s' usa mais de um tipo de delimitador ou o delimitador passado nao corresponde aos do arquivo.\n", nome_arquivo);
             exit(1);
         }
-
+        strcpy(vetor_string_a[i], token);
         vetor_a[i++] = atof(token);
         token = strtok(NULL, separador);
         if(token == NULL){
             fprintf(stderr, "\nERRO: '%s' usa mais de um tipo de delimitador ou o delimitador passado nao corresponde aos do arquivo.\n", nome_arquivo);
             exit(1);
         }
+        strcpy(vetor_string_b[j], token);
         vetor_b[j++] = atof(token);
     }
 }
@@ -211,7 +235,7 @@ void inserir_dados(FILE * p_arquivo)
     }
 }
 
-double media(int size, double vetor[size])
+double media(int size, double vetor[])
 {
     int i;
     double soma = 0;
@@ -222,7 +246,7 @@ double media(int size, double vetor[size])
     return (soma/size);
 }
 
-double moda(int size, double vetor[size])
+double moda(int size, double vetor[])
 {
     int i, j, contador, maior_repeticao = 0, quantidade_repeticoes[size];
 
@@ -244,30 +268,98 @@ double moda(int size, double vetor[size])
     return vetor[maior_repeticao];
 }
 
-int maior_valor(int size, double vetor[size])
+int maior_valor(int size, double vetor[])
 {
     int i, maior = 0;
 
-    for(i = 1; i < size; i++){
+    for(i = 0; i < size; i++){
         if(vetor[i] > vetor[maior]){
             maior = i;
         }
     }
 
-    return i;
+    return maior;
 }
 
-int menor_valor(int size, double vetor[size])
+int menor_valor(int size, double vetor[])
 {
     int i, menor = 0;
 
-    for(i = 1; i < size; i++){
+    for(i = 0; i < size; i++){
         if(vetor[i] < vetor[menor]){
             menor = i;
         }
     }
 
-    return i;
+    return menor;
+}
+
+void tabela_frequencias(int size, double vetor[], int casas_decimais)
+{
+    int qntdd_faixa_valores = ceil(3.3 * log10(size));
+    double maior = vetor[maior_valor(size, vetor)];
+    double menor = vetor[menor_valor(size, vetor)];
+    double amplitude_conjuntos = maior - menor;
+    double amplitude_faixas = arredondar(amplitude_conjuntos/qntdd_faixa_valores, casas_decimais);
+    double faixa_valores[qntdd_faixa_valores + 1];
+    int i;
+
+    faixa_valores[0] = menor;
+    for(i = 1; i < qntdd_faixa_valores + 1; i++){
+        faixa_valores[i] = faixa_valores[i - 1] + amplitude_faixas;
+    }
+    faixa_valores[i] = faixa_valores[i - 1] + amplitude_faixas;
+
+    int frequencia[qntdd_faixa_valores];
+    encontrar_frequencias(qntdd_faixa_valores + 1, faixa_valores, size, vetor, frequencia);
+
+    printf("\nTabela de frequencias:");
+    for(i = 0; i < qntdd_faixa_valores; i++){
+        printf("\n%.*lf  |---  %.*lf | %d", casas_decimais, faixa_valores[i], casas_decimais, faixa_valores[i + 1], frequencia[i]);
+    }
+}
+
+double arredondar(double valor, int casas)
+{
+    return ( ceil(valor * pow(10, casas)) / ((double)pow(10, casas)) );
+}
+
+int quantidade_casas_decimais(int size, char vetor_string[][21])
+{
+    int i, j, contador, maior = 0;
+    char str_aux[21];
+
+    for(i = 0; i < size; i++){
+        contador = 0;
+        j = 0;
+        strcpy(str_aux, vetor_string[i]);
+        strrev(str_aux);
+        while(str_aux[j] == '0' && j < strlen(str_aux)){
+            contador++;
+            j++;
+        }
+        if(contador > maior){
+            maior = contador;
+        }
+    }
+    return (7 - maior);
+}
+
+void encontrar_frequencias(int size_faixa, double faixa_valores[], int size_vetor, double vetor[], int frequencia[])
+{
+    int i, j, contador;
+
+    for(i = 0; i < size_faixa; i++){
+        contador = 0;
+        for(j = 0; j < size_vetor; j++){
+            if((vetor[j] >= faixa_valores[i]) && (vetor[j] < faixa_valores[i + 1])){
+                printf("\nvetor[%d](%lf) >= faixa[%d](%lf) && vetor[%d](%lf) < faixa[%d + 1](%lf)",j, vetor[j], i, faixa_valores[i], j, vetor[j], i, faixa_valores[i+1]);
+                contador++;
+            }
+        }
+        frequencia[i] = contador;
+        printf("\n%d: %d", i, frequencia[i]);
+    }
 }
 
 /*
