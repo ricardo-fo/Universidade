@@ -30,7 +30,12 @@ void inserir_dados(FILE *);
 double media(int, double []);
 double moda(int, double []);
 void tabela_frequencias(int, double [], int);
+void encontrar_faixa_valores(double, int, double, double []);
+void encontar_ponto_medio(int, double [], float []);
 void encontrar_frequencias(int, double [], int, double [], int []);
+void encontrar_frequencias_acumuladas(int, int [], int []);
+void encontrar_frequencias_relativas(int, int, int [], float []);
+void encontrar_frequencias_relativas_acumuladas(int, int, int [], float []);
 
 // Ferramentas
 int maior_valor(int, double []);
@@ -52,7 +57,7 @@ int main()
     printf("\n* Os coeficientes de Pearson e da reta de minimos quadrados.");
     printf("\n------------------------------------------------------------------------------------------------------\n");
 
-    // Menu principal.
+    // Menu principal
     do{
         printf("\nInforme o numero de uma das opcoes abaixo para fazer a acao desejada:");
         printf("\n<1> Inserir nome de arquivo que possua os dados;");
@@ -60,7 +65,7 @@ int main()
         printf("\n<0> Sair.");
         printf("\nOpcao: ");
         scanf(" %c", &opcao);
-        while((getchar()) != '\n'); // Eliminação de digitos em excesso (limpar o buffer).
+        while((getchar()) != '\n'); // limpeza do buffer
 
         switch(opcao){
             case '1':
@@ -86,43 +91,54 @@ int main()
     return 0;
 }
 
+/*
+ * Este procedimento executa um submenu para coletar os dados do arquivo e, em seguida, fazer todas as tarefas pedidas.
+*/
 void calcular_arquivo_existente()
 {
-    char buffer;
-    char separador[2];
+    char buffer; // para limpar o teclado.
+    char separador[2]; // divisor/delimitador dos conjuntos do arquivo.
     char nome_arquivo[101];
     inserir_nome_arquivo(nome_arquivo);
     FILE * p_arquivo = abrir_arquivo(nome_arquivo, "r");
+    if(p_arquivo == NULL) return; // caso o arquivo falhe na abertura.
 
+    // leitura do divisor dos conjuntos do arquivo.
     printf("\nSeparador: ");
     scanf(" %1s", separador);
-    while((buffer = getchar()) != '\n');
+    while((buffer = getchar()) != '\n'); // limpeza do buffer do teclado.
 
     printf("\n============================================================\n");
 
     int aux;
-    int size = quantidade_valores(p_arquivo, separador);
-    double vetor_a[size];
-    double vetor_b[size];
-    char vetor_string_a[size][21];
-    char vetor_string_b[size][21];
+    int size = quantidade_valores(p_arquivo, separador);// quantidade de valores que tem em um conjunto, pegos do arquivo.
+    double vetor_a[size]; // vetor para armazenar os valores do primeiro conjunto/coluna.
+    double vetor_b[size]; // vetor para armazenar os valores da segundo conjunto/coluna.
+    char vetor_string_a[size][21]; // vetor para armazenar os valores do primeiro conjunto/coluna em formato de string.
+    char vetor_string_b[size][21]; // vetor para armazenar os valores da segundo conjunto/coluna em formato de string.
+    // NOTA: os vetores que armazenam os valores em string são necessário para fazer o arredondamento da amplitude das faixas.
 
-    coletar_dados(size, vetor_a, vetor_b, p_arquivo, nome_arquivo, separador, vetor_string_a, vetor_string_b);
+    coletar_dados(size, vetor_a, vetor_b, p_arquivo, nome_arquivo, separador, vetor_string_a, vetor_string_b); // coleta dos dados do arquivo e passagem para os vetores.
     fclose(p_arquivo);
 
     printf("Media dos valores do vetor A: %lf\n", media(size, vetor_a));
     printf("Moda do vetor A: %lf\n", moda(size, vetor_a));
 
-    int casas_decimais = quantidade_casas_decimais(size, vetor_string_a);
+    int casas_decimais = quantidade_casas_decimais(size, vetor_string_a); // quantidade de casas após a vírgula que é usado na primeira coluna.
+    printf("\nSobre os dados do primeiro conjunto:");
     tabela_frequencias(size, vetor_a, casas_decimais);
-    /*if((aux = quantidade_casas_decimais(size, vetor_string_b)) > casas_decimais){
-        casas_decimais = aux;
-    }
 
-    calcular_faixa_valores(size, vetor_b, casas_decimais);*/
+    casas_decimais = quantidade_casas_decimais(size, vetor_string_b); // quantidade de casas após a vírgula que é usado na segunda coluna.
+    printf("\n\nSobre os dados do segundo conjunto:");
+    tabela_frequencias(size, vetor_b, casas_decimais);
+
     printf("\n============================================================\n");
 }
 
+/*
+ * Este procedimento lê o nome de um arquivo e evita erros de execução.
+ * Paramêtro: char nome_arquivo[] => string para armazenar o nome do arquivo.
+*/
 void inserir_nome_arquivo(char nome_arquivo[])
 {
     char buffer;
@@ -130,21 +146,31 @@ void inserir_nome_arquivo(char nome_arquivo[])
     printf("\nExemplo: meu_arquivo.txt\n");
     printf("\nNome do arquivo: ");
     scanf(" %100[^\n]", nome_arquivo);
-    while((buffer = getchar() != '\n'));
+    while((buffer = getchar() != '\n')); // limpeza do buffer.
 }
 
+/*
+ * Esta função verifica se é possível abrir o arquivo passado.
+ * Paramêtros: const char * nome_arquivo => string constante com o nome do arquivo a ser aberto.
+               const char * tipo => string constante com o tipo de abertura, i.e. [r, a, w, r+ ...]
+ * Retorno: o ponteiro do arquivo caso a abertura seja bem sucedida; caso contrário, NULL.
+*/
 FILE * abrir_arquivo(const char * nome_arquivo, const char * tipo)
 {
-    FILE * p_arquivo;
+    FILE * p_arquivo; // stream do arquivo.
     if((p_arquivo = fopen(nome_arquivo, tipo)) == NULL){
         printf("\n******************************************************************************************************");
         fprintf(stderr, "\nErro: Arquivo '%s' nao foi encontrado ou nao pode ser aberto.", nome_arquivo);
         printf("\n******************************************************************************************************");
         fclose(p_arquivo);
+        return NULL;
     }
     return p_arquivo;
 }
 
+/*
+ * Esta função
+*/
 int quantidade_valores(FILE * p_arquivo, const char * separador)
 {
     int i, contador = 0;
@@ -304,18 +330,32 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     double faixa_valores[qntdd_faixa_valores + 1];
     int i;
 
-    faixa_valores[0] = menor;
-    for(i = 1; i < qntdd_faixa_valores + 1; i++){
-        faixa_valores[i] = faixa_valores[i - 1] + amplitude_faixas;
-    }
-    faixa_valores[i] = faixa_valores[i - 1] + amplitude_faixas;
+    encontrar_faixa_valores(menor, qntdd_faixa_valores, amplitude_faixas, faixa_valores);
+
+    float ponto_medio[qntdd_faixa_valores];
+    encontar_ponto_medio(qntdd_faixa_valores, faixa_valores, ponto_medio);
 
     int frequencia[qntdd_faixa_valores];
     encontrar_frequencias(qntdd_faixa_valores + 1, faixa_valores, size, vetor, frequencia);
 
+    int frequencia_acumulada[qntdd_faixa_valores];
+    encontrar_frequencias_acumuladas(qntdd_faixa_valores, frequencia, frequencia_acumulada);
+
+    float frequencia_relativa[qntdd_faixa_valores];
+    encontrar_frequencias_relativas(qntdd_faixa_valores, size, frequencia, frequencia_relativa);
+
+    float frequencia_relativa_acumulada[qntdd_faixa_valores];
+    encontrar_frequencias_relativas_acumuladas(qntdd_faixa_valores, size, frequencia_acumulada, frequencia_relativa_acumulada);
+
     printf("\nTabela de frequencias:");
+    printf("\nFaixa de valores | P.M. | frq | fra | fr.r. | fr.ra |");
     for(i = 0; i < qntdd_faixa_valores; i++){
-        printf("\n%.*lf  |---  %.*lf | %d", casas_decimais, faixa_valores[i], casas_decimais, faixa_valores[i + 1], frequencia[i]);
+        printf("\n%.*lf  |---  %.*lf | ", casas_decimais, faixa_valores[i], casas_decimais, faixa_valores[i + 1]);
+        printf("%0.*f | ", 2, ponto_medio[i]);
+        printf("%0.*d | ", 3, frequencia[i]);
+        printf("%0.*d | ", 3, frequencia_acumulada[i]);
+        printf("%0.*f | ", 3, frequencia_relativa[i]);
+        printf("%0.*f | ", 3, frequencia_relativa_acumulada[i]);
     }
 }
 
@@ -345,6 +385,26 @@ int quantidade_casas_decimais(int size, char vetor_string[][21])
     return (7 - maior);
 }
 
+void encontrar_faixa_valores(double menor, int size, double amplitude_faixas, double faixa_valores[])
+{
+    int i;
+
+    faixa_valores[0] = menor;
+    for(i = 1; i < size + 1; i++){
+        faixa_valores[i] = faixa_valores[i - 1] + amplitude_faixas;
+    }
+    faixa_valores[i] = faixa_valores[i - 1] + amplitude_faixas;
+}
+
+void encontar_ponto_medio(int size, double faixa_valores[], float ponto_medio[])
+{
+    int i;
+
+    for(i = 0; i < size; i++){
+        ponto_medio[i] = (float)(faixa_valores[i] + faixa_valores[i + 1]) / 2;
+    }
+}
+
 void encontrar_frequencias(int size_faixa, double faixa_valores[], int size_vetor, double vetor[], int frequencia[])
 {
     int i, j, contador;
@@ -352,13 +412,39 @@ void encontrar_frequencias(int size_faixa, double faixa_valores[], int size_veto
     for(i = 0; i < size_faixa; i++){
         contador = 0;
         for(j = 0; j < size_vetor; j++){
-            if((vetor[j] >= faixa_valores[i]) && (vetor[j] < faixa_valores[i + 1])){
-                printf("\nvetor[%d](%lf) >= faixa[%d](%lf) && vetor[%d](%lf) < faixa[%d + 1](%lf)",j, vetor[j], i, faixa_valores[i], j, vetor[j], i, faixa_valores[i+1]);
+            if(((float)vetor[j] >= (float)faixa_valores[i]) && ((float)vetor[j] < (float)faixa_valores[i + 1])){
                 contador++;
             }
         }
         frequencia[i] = contador;
-        printf("\n%d: %d", i, frequencia[i]);
+    }
+}
+
+void encontrar_frequencias_acumuladas(int size, int frequencia[], int frequencia_acumulada[])
+{
+    int i;
+
+    frequencia_acumulada[0] = frequencia[0];
+    for(i = 1; i < size; i++){
+        frequencia_acumulada[i] = frequencia_acumulada[i - 1] +  frequencia[i];
+    }
+}
+
+void encontrar_frequencias_relativas(int size_faixas, int size_valores, int frequencia[], float frequencia_relativa[])
+{
+    int i;
+
+    for(i = 0; i < size_faixas; i++){
+        frequencia_relativa[i] = frequencia[i] / (float)size_valores;
+    }
+}
+
+void encontrar_frequencias_relativas_acumuladas(int size_faixas, int size, int frequencia_acumulada[], float frequencia_relativa_acumulada[])
+{
+    int i;
+
+    for(i = 0; i < size_faixas; i++){
+        frequencia_relativa_acumulada[i] = frequencia_acumulada[i] / (float)size;
     }
 }
 
