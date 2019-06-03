@@ -12,7 +12,7 @@
 #include <stdlib.h> // uso: fprintf(); fscanf();
 #include <string.h> // uso: strcat(); strcmp(); strrchr(); strtok(); strcpy(); strlen(); strrev();
 #include <stdbool.h> // uso: true e false;
-#include <math.h> // uso: log10();
+#include <math.h> // uso: log10(); pow(); sqrt();
 #include <ctype.h> // uso: isdigit();
 
 // Correção de divisões por 0
@@ -47,6 +47,7 @@ double encontrar_quartil_inferior(int, double []);
 double encontrar_quartil_superior(int, double []);
 void encontrar_box_plot(double, double, double, int, double [], double []);
 void encontrar_outliers(double, double, int *, double [], int, double []);
+double encontrar_desvio_padrao(int, double, double []);
 
 // Ferramentas
 int maior_valor(int, double []);
@@ -338,16 +339,18 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     }
 
     // Média para valores não agrupados
-    printf("\n\nMedia dos valores: %lf", encontrar_media_valores(size, vetor));
+    double media_valores = encontrar_media_valores(size, vetor);
+    printf("\n\nMedia dos valores = %lf", media_valores);
     
     // Média para valores agrupados
-    printf("\nMedia das faixas de valores: %lf", encontrar_media_faixas(qntdd_faixa_valores, ponto_medio, frequencia));
+    double media_faixas = encontrar_media_faixas(qntdd_faixa_valores, ponto_medio, frequencia);
+    printf("\nMedia das faixas de valores = %lf", media_faixas);
     printf("\n");
 
     // Moda para valores não agrupados
     double moda_valores[size];
     int qntdd_modas = 0;
-    printf("\nModa(s) dos valores:");
+    printf("\nModa(s) dos valores: ");
     encontrar_moda_valores(size, vetor, moda_valores, &qntdd_modas);
     for(i = 0; i < qntdd_modas; i++){
         printf("%.*lf, ", casas_decimais, moda_valores[i]);
@@ -356,7 +359,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     // Moda para valores agrupados
     double moda_faixas[qntdd_faixa_valores];
     encontrar_moda_faixas(qntdd_faixa_valores, faixa_valores, frequencia, amplitude_faixas, moda_faixas, &qntdd_modas);
-    printf("\nModa das faixas de valores:");
+    printf("\nModa das faixas de valores: ");
     for(i = 0; i < qntdd_modas; i++){
         moda_faixas[i] = arredondar(moda_faixas[i], casas_decimais);
         printf("%.*lf, ", casas_decimais, moda_faixas[i]);
@@ -364,6 +367,9 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     printf("\n");
 
     // Desvio padrão para valores não agrupados
+    double desvio_padrao = encontrar_desvio_padrao(size, media_valores, vetor);
+    printf("\nDesvio padrao = %.*lf", casas_decimais, desvio_padrao);
+    printf("\n");
 
     // Box-plot
     double mediana = encontrar_mediana(size, vetor);
@@ -618,6 +624,18 @@ void encontrar_outliers(double lim_inf, double lim_sup, int * qntdd_outliers, do
         }
     }
     *qntdd_outliers = k;
+}
+
+double encontrar_desvio_padrao(int size, double media, double vetor[])
+{
+    int i;
+    double soma = 0;
+
+    for(i = 0; i < size; i++){
+        soma += pow((vetor[i] - media), 2);
+    }
+
+    return sqrt( ((1 / size) * soma) );
 }
 /* FIM ESTATÍSTICA ----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
