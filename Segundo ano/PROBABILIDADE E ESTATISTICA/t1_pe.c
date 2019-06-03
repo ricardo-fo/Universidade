@@ -15,6 +15,9 @@
 #include <math.h> // uso: log10();
 #include <ctype.h> // uso: isdigit();
 
+// Correção de divisões por 0
+#define DIV_0 0.000001
+
 // Opções do menu
 void calcular_arquivo_existente(void);
 void criar_arquivo_novo(void);
@@ -35,10 +38,15 @@ void encontrar_frequencias(int, double [], int, double [], int []);
 void encontrar_frequencias_acumuladas(int, int [], int []);
 void encontrar_frequencias_relativas(int, int, int [], float []);
 void encontrar_frequencias_relativas_acumuladas(int, int, int [], float []);
-double media_valores(int, double []);
-double media_faixas(int, float [], int []);
-void moda_valores(int, double [], double [], int *);
-double moda_faixas(int, double [], int []);
+double encontrar_media_valores(int, double []);
+double encontrar_media_faixas(int, float [], int []);
+void encontrar_moda_valores(int, double [], double [], int *);
+void encontrar_moda_faixas(int, double [], int [], double, double [], int *);
+double encontrar_mediana(int, double []);
+double encontrar_quartil_inferior(int, double []);
+double encontrar_quartil_superior(int, double []);
+void encontrar_box_plot(double, double, double, int, double [], double []);
+void encontrar_outliers(double, double, int *, double [], int, double []);
 
 // Ferramentas
 int maior_valor(int, double []);
@@ -102,7 +110,6 @@ int main()
 }
 
 /* OPÇÕES DO MENU ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
 void calcular_arquivo_existente()
 {
     /* Este procedimento executa um submenu para coletar os dados do arquivo e, em seguida, fazer todas as tarefas pedidas. */
@@ -142,14 +149,14 @@ void calcular_arquivo_existente()
     } // coleta dos dados do arquivo e passagem para os vetores.
     fclose(p_arquivo);
 
+    printf("\n============================================================");
+    int casas_decimais = quantidade_casas_decimais(size, vetor_string_a); // quantidade de casas após a vírgula que é usado na primeira coluna.
+    printf("\nSobre os dados do primeiro conjunto (coluna da esquerda):");
+    tabela_frequencias(size, vetor_a, casas_decimais);
     printf("\n============================================================\n");
 
-    int casas_decimais = quantidade_casas_decimais(size, vetor_string_a); // quantidade de casas após a vírgula que é usado na primeira coluna.
-    printf("\nSobre os dados do primeiro conjunto:");
-    tabela_frequencias(size, vetor_a, casas_decimais);
-
     casas_decimais = quantidade_casas_decimais(size, vetor_string_b); // quantidade de casas após a vírgula que é usado na segunda coluna.
-    printf("\n\nSobre os dados do segundo conjunto:");
+    printf("\nSobre os dados do segundo conjunto (coluna da direita):");
     tabela_frequencias(size, vetor_b, casas_decimais);
     printf("\n============================================================\n");
 }
@@ -175,7 +182,6 @@ void criar_arquivo_novo()
 /* FIM OPÇÕES DO MENU -----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /* MANIPULAÇÃO DE ARQUIVOS ------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
 void inserir_nome_arquivo(char nome_arquivo[])
 {
     /* Este procedimento lê o nome de um arquivo e evita erros de execução.
@@ -319,6 +325,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     float frequencia_relativa_acumulada[qntdd_faixa_valores];
     encontrar_frequencias_relativas_acumuladas(qntdd_faixa_valores, size, frequencia_acumulada, frequencia_relativa_acumulada);
 
+    // Tabela de frequências
     printf("\nTabela de frequencias:");
     printf("\nFaixa de valores | P.M. | frq | fra | fr.r. | fr.ra |");
     for(i = 0; i < qntdd_faixa_valores; i++){
@@ -329,17 +336,59 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
         printf("%0.*f | ", 3, frequencia_relativa[i]);
         printf("%0.*f | ", 3, frequencia_relativa_acumulada[i]);
     }
-    double moda[size];
-    printf("\n\nMedia dos valores do conjunto A: %lf", media_valores(size, vetor));
-    printf("\nMedia das faixas de valores do conjunto A: %lf", media_faixas(qntdd_faixa_valores, ponto_medio, frequencia));
-    printf("\nModa(s) do vetor A:");
+
+    // Média para valores não agrupados
+    printf("\n\nMedia dos valores: %lf", encontrar_media_valores(size, vetor));
+    
+    // Média para valores agrupados
+    printf("\nMedia das faixas de valores: %lf", encontrar_media_faixas(qntdd_faixa_valores, ponto_medio, frequencia));
+    printf("\n");
+
+    // Moda para valores não agrupados
+    double moda_valores[size];
     int qntdd_modas = 0;
-    moda_valores(size, vetor, moda, &qntdd_modas);
+    printf("\nModa(s) dos valores:");
+    encontrar_moda_valores(size, vetor, moda_valores, &qntdd_modas);
     for(i = 0; i < qntdd_modas; i++){
-        printf("%lf, ", moda[i]);
+        printf("%.*lf, ", casas_decimais, moda_valores[i]);
     }
-    printf("\b\b\n");
-    //printf("\nModa do vetor A: %lf\n", moda_faixas(size, vetor));
+
+    // Moda para valores agrupados
+    double moda_faixas[qntdd_faixa_valores];
+    encontrar_moda_faixas(qntdd_faixa_valores, faixa_valores, frequencia, amplitude_faixas, moda_faixas, &qntdd_modas);
+    printf("\nModa das faixas de valores:");
+    for(i = 0; i < qntdd_modas; i++){
+        moda_faixas[i] = arredondar(moda_faixas[i], casas_decimais);
+        printf("%.*lf, ", casas_decimais, moda_faixas[i]);
+    }
+    printf("\n");
+
+    // Desvio padrão para valores não agrupados
+
+    // Box-plot
+    double mediana = encontrar_mediana(size, vetor);
+    double quaritl_inf = encontrar_quartil_inferior(size, vetor);
+    double quaritl_sup = encontrar_quartil_superior(size, vetor);
+    double box_plot[5];
+    encontrar_box_plot(quaritl_inf, mediana, quaritl_sup, size, vetor, box_plot);
+    printf("\nBox-Plot:");
+    printf("\nLimite inferior = %.*lf", casas_decimais, box_plot[0]);
+    printf("\nQuartil inferior = %.*lf", casas_decimais, box_plot[1]);
+    printf("\nMediana = %.*lf", casas_decimais, box_plot[2]);
+    printf("\nQuartil superior = %.*lf", casas_decimais, box_plot[3]);
+    printf("\nLimite superior = %.*lf", casas_decimais, box_plot[4]);
+    int qntdd_outliers;
+    double outliers[size];
+    encontrar_outliers(box_plot[0], box_plot[4], &qntdd_outliers, vetor, size, outliers);
+    if(qntdd_outliers > 0){
+        printf("\nOutliers: ");
+        for(i = 0; i < qntdd_outliers; i++){
+            printf("%.*lf, ", outliers[i]);
+        }
+    } else {
+        printf("\nNao ha' outliers.");
+    }
+    printf("\n");
 }
 
 void encontrar_faixa_valores(double menor, int size, double amplitude_faixas, double faixa_valores[])
@@ -392,6 +441,7 @@ void encontrar_frequencias_relativas(int size_faixas, int size_valores, int freq
     int i;
 
     for(i = 0; i < size_faixas; i++){
+        if(size_valores == 0) break;
         frequencia_relativa[i] = frequencia[i] / (float)size_valores;
     }
 }
@@ -401,27 +451,30 @@ void encontrar_frequencias_relativas_acumuladas(int size_faixas, int size, int f
     int i;
 
     for(i = 0; i < size_faixas; i++){
+        if(size == 0) break;
         frequencia_relativa_acumulada[i] = frequencia_acumulada[i] / (float)size;
     }
 }
 
-double media_valores(int size, double vetor[])
+double encontrar_media_valores(int size, double vetor[])
 {
+    if(size == 0) return 0;
+
     return (soma_simples_double(size, vetor)/size);
 }
 
-double media_faixas(int size, float ponto_medio[], int frequencias[])
+double encontrar_media_faixas(int size, float ponto_medio[], int frequencias[])
 {
-    int i;
+    if(size == 0) return 0;
 
     return(soma_produtos(size, ponto_medio, frequencias)/soma_simples_int(size, frequencias));
 }
 
-void moda_valores(int size, double vetor[], double moda[], int * qntdd_modas)
+void encontrar_moda_valores(int size, double vetor[], double moda[], int * qntdd_modas)
 {
     int i, j, contador, maior_repeticao = 0, quantidade_repeticoes[size];
 
-    for(i = 0; i < size; i++){
+    for(i = 0; i < size; i++){ //Contar quantas repetições há para cada valor
         contador = 0;
         for(j = 0; j < size; j++){
             if(vetor[i] == vetor[j]){
@@ -431,7 +484,7 @@ void moda_valores(int size, double vetor[], double moda[], int * qntdd_modas)
         quantidade_repeticoes[i] = contador;
     }
 
-    for(i = 0; i < size; i++){
+    for(i = 0; i < size; i++){ // encontrar maior repetição
         if(quantidade_repeticoes[i] > quantidade_repeticoes[maior_repeticao]){
             maior_repeticao = i;
         }
@@ -440,28 +493,132 @@ void moda_valores(int size, double vetor[], double moda[], int * qntdd_modas)
     int k = 0;
     bool ja_esta;
 
-    for(i = 0; i < size; i++){
+    for(i = 0; i < size; i++){ // Verificar a quantidade de modas e inserir as modas num vetor
         if(quantidade_repeticoes[maior_repeticao] == quantidade_repeticoes[i]){
             ja_esta = false;
-            for(j = 0; j < size; j++){
+            for(j = 0; j < size; j++){ // não repetir valores no vetor que armazena as modas
                 if(moda[j] == vetor[i]){
                     ja_esta = true;
                     break;
                 }
             }
-            if(!ja_esta){
+            if(!ja_esta){ // inserir moda no vetor
                 moda[k++] = vetor[i];
             }
         }
     }
-    //quick_sort(moda, 0, k);
+    quick_sort(moda, 0, k-1); // ordenar as modas para fins estéticos
+    *qntdd_modas = k; // quantidade de modas
+}
+
+void encontrar_moda_faixas(int size, double faixa_valores[], int frequencia[], double amplitude_modal, double moda[], int * qntdd_modas)
+{
+    int i, j, k = 0, maior_repeticao = 0;
+    bool ja_esta;
+
+    for(i = 0; i < size; i++){ // Encontrar maior frequência
+        if(frequencia[i] > frequencia[maior_repeticao]){
+            maior_repeticao = i;
+        }
+    }
+
+    double aux;;
+    for(i = 1; i < size; i++){
+        if(frequencia[maior_repeticao] == frequencia[i]){
+            aux = faixa_valores[(i % 2 == 0? i - 1 : i)] + (amplitude_modal * (frequencia[i + 1] / ((frequencia[i - 1] + frequencia[i + 1]) == 0? DIV_0 : (frequencia[i - 1] + frequencia[i + 1])) ));
+            ja_esta = false;
+            for(j = 0; j < i; j++){ // não repetir valores no vetor que armazena as modas
+                if(moda[j] == aux){
+                    ja_esta = true;
+                    break;
+                }
+            }
+            if(!ja_esta){ // inserir moda no vetor
+                moda[k++] = aux;
+            }
+        }
+    }
+    quick_sort(moda, 0, k-1); // ordenar as modas para fins estéticos
     *qntdd_modas = k;
 }
 
-/*double moda_faixas()
+double encontrar_mediana(int size, double vetor[])
 {
+    int i;
+    double aux[size];
 
-}*/
+    for(i = 0; i < size; i++){
+        aux[i] = vetor[i];
+    }
+
+    quick_sort(aux, 0, size - 1);
+
+    if(size % 2 == 0){
+        return((aux[size / 2]));
+    }
+    return(aux[(size + 1) / 2]);
+}
+
+double encontrar_quartil_inferior(int size, double vetor[])
+{
+    int i;
+    double aux[size];
+
+    for(i = 0; i < size; i++){
+        aux[i] = vetor[i];
+    }
+
+    quick_sort(aux, 0, size - 1);
+
+    return aux[(size + 1) / 4];
+}
+
+double encontrar_quartil_superior(int size, double vetor[])
+{
+    int i;
+    double aux[size];
+
+    for(i = 0; i < size; i++){
+        aux[i] = vetor[i];
+    }
+
+    quick_sort(aux, 0, size - 1);
+
+    return aux[(3 * (size + 1)) / 4];
+}
+
+void encontrar_box_plot(double quaritl_inf, double mediana, double quaritl_sup, int size, double vetor[], double box_plot[])
+{
+    double interquartil = quaritl_sup - quaritl_inf;
+    double lim_inf = quaritl_inf - 1.5 * interquartil;
+    double lim_sup = quaritl_sup + 1.5 * interquartil;
+
+    box_plot[0] = lim_inf;
+    box_plot[1] = quaritl_inf;
+    box_plot[2] = mediana;
+    box_plot[3] = quaritl_sup;
+    box_plot[4] = lim_sup;
+}
+
+void encontrar_outliers(double lim_inf, double lim_sup, int * qntdd_outliers, double vetor[], int size, double outliers[])
+{
+    int i, k = 0;
+
+    double aux[size];
+
+    for(i = 0; i < size; i++){
+        aux[i] = vetor[i];
+    }
+    quick_sort(aux, 0, size - 1);
+
+    for(i = 0; i < size; i++){
+        if(aux[i] < lim_inf || aux[i] > lim_sup){
+            outliers[k] = aux[i];
+            k++;
+        }
+    }
+    *qntdd_outliers = k;
+}
 /* FIM ESTATÍSTICA ----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /* FERRAMENTAS --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
