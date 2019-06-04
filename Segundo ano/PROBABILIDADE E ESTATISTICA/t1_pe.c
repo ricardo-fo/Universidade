@@ -40,14 +40,16 @@ void encontrar_frequencias_relativas(int, int, int [], float []);
 void encontrar_frequencias_relativas_acumuladas(int, int, int [], float []);
 double encontrar_media_valores(int, double []);
 double encontrar_media_faixas(int, float [], int []);
-void encontrar_moda_valores(int, double [], double [], int *);
-void encontrar_moda_faixas(int, double [], int [], double, double [], int *);
+int encontrar_moda_valores(int, double [], double [], int *);
+int encontrar_moda_faixas(int, double [], int [], double, double [], int *);
 double encontrar_mediana(int, double []);
 double encontrar_quartil_inferior(int, double []);
 double encontrar_quartil_superior(int, double []);
 void encontrar_box_plot(double, double, double, int, double [], double []);
 void encontrar_outliers(double, double, int *, double [], int, double []);
 double encontrar_desvio_padrao(int, double, double []);
+void encontrar_correlacao_Pearson(int, double [], double []);
+void encontrar_regressao_linear(int, double [], double []);
 
 // Ferramentas
 int maior_valor(int, double []);
@@ -84,7 +86,7 @@ int main()
         printf("\n<0> Sair.");
         printf("\nOpcao: ");
         scanf(" %c", &opcao);
-        while((getchar()) != '\n'); // limpeza do buffer
+        while((buffer = getchar()) != '\n'); // limpeza do buffer
 
         switch(opcao){
             case '1':
@@ -160,6 +162,8 @@ void calcular_arquivo_existente()
     printf("\nSobre os dados do segundo conjunto (coluna da direita):");
     tabela_frequencias(size, vetor_b, casas_decimais);
     printf("\n============================================================\n");
+
+    encontrar_correlacao_Pearson(size, vetor_a, vetor_b);
 }
 
 void criar_arquivo_novo()
@@ -238,13 +242,21 @@ void inserir_dados(FILE * p_arquivo)
     printf("\nQuantidade de dados a ser inserido: ");
     while((scanf("%d", &qntdd_dados) != 1) || qntdd_dados < 0){
         while((buffer = getchar()) != '\n');
-        printf("\nValor invalido.\n");
+        printf("\nEntrada invalida.\n");
         printf("\nQuantidade de dados a ser inserido: ");
     }
 
     printf("\nSimbolo a ser usado: ");
     scanf(" %c", &separador);
     while((buffer = getchar()) != '\n');
+    while(separador == '.' || isdigit(separador) != 0){
+        printf("\n******************************************************************************************************");
+        fprintf(stderr, "\nErro: '%c' nao e' um separador valido. Nao utilize o caractere ponto ou numeros como separador.", separador);
+        printf("\n******************************************************************************************************");
+        printf("\nSimbolo a ser usado: ");
+        scanf(" %c", &separador);
+        while((buffer = getchar()) != '\n');
+    }
 
     printf("\nInsercao de dados. Utilize espaco para cada coluna. Exemplo:\n2.8 3.7\n4.6 5.5\n1.9 7.3\n. . .\n");
     for(i = 0; i < qntdd_dados/2; i++){
@@ -330,7 +342,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     printf("\nTabela de frequencias:");
     printf("\nFaixa de valores | P.M. | frq | fra | fr.r. | fr.ra |");
     for(i = 0; i < qntdd_faixa_valores; i++){
-        printf("\n%.*lf  |---  %.*lf | ", casas_decimais, faixa_valores[i], casas_decimais, faixa_valores[i + 1]);
+        printf("\n%05.*lf  |---  %05.*lf | ", casas_decimais, faixa_valores[i], casas_decimais, faixa_valores[i + 1]);
         printf("%0.*f | ", 2, ponto_medio[i]);
         printf("%0.*d | ", 3, frequencia[i]);
         printf("%0.*d | ", 3, frequencia_acumulada[i]);
@@ -341,7 +353,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     // Média para valores não agrupados
     double media_valores = encontrar_media_valores(size, vetor);
     printf("\n\nMedia dos valores = %lf", media_valores);
-    
+
     // Média para valores agrupados
     double media_faixas = encontrar_media_faixas(qntdd_faixa_valores, ponto_medio, frequencia);
     printf("\nMedia das faixas de valores = %lf", media_faixas);
@@ -350,19 +362,26 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     // Moda para valores não agrupados
     double moda_valores[size];
     int qntdd_modas = 0;
-    printf("\nModa(s) dos valores: ");
-    encontrar_moda_valores(size, vetor, moda_valores, &qntdd_modas);
-    for(i = 0; i < qntdd_modas; i++){
-        printf("%.*lf, ", casas_decimais, moda_valores[i]);
+    if(encontrar_moda_valores(size, vetor, moda_valores, &qntdd_modas) == 0){
+        printf("\nNao ha' moda.");
+    } else {
+        printf("\nModa(s) dos valores: ");
+        for(i = 0; i < qntdd_modas; i++){
+            printf("%.*lf, ", casas_decimais, moda_valores[i]);
+        }
     }
+
 
     // Moda para valores agrupados
     double moda_faixas[qntdd_faixa_valores];
-    encontrar_moda_faixas(qntdd_faixa_valores, faixa_valores, frequencia, amplitude_faixas, moda_faixas, &qntdd_modas);
-    printf("\nModa das faixas de valores: ");
-    for(i = 0; i < qntdd_modas; i++){
-        moda_faixas[i] = arredondar(moda_faixas[i], casas_decimais);
-        printf("%.*lf, ", casas_decimais, moda_faixas[i]);
+    if(encontrar_moda_faixas(qntdd_faixa_valores, faixa_valores, frequencia, amplitude_faixas, moda_faixas, &qntdd_modas) == 0){
+        printf("\nNao ha' moda.");
+    } else {
+        printf("\nModa(s) das faixas de valores: ");
+        for(i = 0; i < qntdd_modas; i++){
+            moda_faixas[i] = arredondar(moda_faixas[i], casas_decimais);
+            printf("%.*lf, ", casas_decimais, moda_faixas[i]);
+        }
     }
     printf("\n");
 
@@ -472,11 +491,12 @@ double encontrar_media_valores(int size, double vetor[])
 double encontrar_media_faixas(int size, float ponto_medio[], int frequencias[])
 {
     if(size == 0) return 0;
-
-    return(soma_produtos(size, ponto_medio, frequencias)/soma_simples_int(size, frequencias));
+    int soma = soma_simples_int(size, frequencias);
+    if(soma == 0) return(soma_produtos(size, ponto_medio, frequencias)/DIV_0);
+    return(soma_produtos(size, ponto_medio, frequencias)/soma);
 }
 
-void encontrar_moda_valores(int size, double vetor[], double moda[], int * qntdd_modas)
+int encontrar_moda_valores(int size, double vetor[], double moda[], int * qntdd_modas)
 {
     int i, j, contador, maior_repeticao = 0, quantidade_repeticoes[size];
 
@@ -513,11 +533,15 @@ void encontrar_moda_valores(int size, double vetor[], double moda[], int * qntdd
             }
         }
     }
+    if(size == k){
+        return 0;
+    }
     quick_sort(moda, 0, k-1); // ordenar as modas para fins estéticos
     *qntdd_modas = k; // quantidade de modas
+    return 1;
 }
 
-void encontrar_moda_faixas(int size, double faixa_valores[], int frequencia[], double amplitude_modal, double moda[], int * qntdd_modas)
+int encontrar_moda_faixas(int size, double faixa_valores[], int frequencia[], double amplitude_modal, double moda[], int * qntdd_modas)
 {
     int i, j, k = 0, maior_repeticao = 0;
     bool ja_esta;
@@ -544,8 +568,12 @@ void encontrar_moda_faixas(int size, double faixa_valores[], int frequencia[], d
             }
         }
     }
+    if(size == k){
+        return 0;
+    }
     quick_sort(moda, 0, k-1); // ordenar as modas para fins estéticos
     *qntdd_modas = k;
+    return 1;
 }
 
 double encontrar_mediana(int size, double vetor[])
@@ -636,6 +664,59 @@ double encontrar_desvio_padrao(int size, double media, double vetor[])
     }
 
     return sqrt( ((1 / size) * soma) );
+}
+
+void encontrar_correlacao_Pearson(int size, double vetor_x[], double vetor_y[])
+{
+    double media_x, media_y, soma_xy, r;
+    int i;
+    media_x = encontrar_media_valores(size, vetor_x);
+    media_y = encontrar_media_valores(size, vetor_y);
+
+
+    for (i = 0; i < size; i++){
+            soma_xy += vetor_x[i] * vetor_y[i];
+    }
+
+    double aux = encontrar_desvio_padrao(size, media_x, vetor_x) * encontrar_desvio_padrao(size, media_y, vetor_y);
+    if(aux == 0){
+        printf("\nDivisao por 0.");
+        return;
+    }
+    r = (soma_xy - media_x * media_y) / aux;
+    printf("\n\nCorrelacao de Pearson:\nr = %lf ", r);
+
+    if (r > 0.6){
+        printf("(Correlacao forte)");
+    }
+    else {
+        if (r > 0.3){
+            printf("(Correlacao fraca)");
+        }
+        else{
+            printf("(Correlacao muito fraca ou inexistente)");
+        }
+    }
+}
+
+void encontrar_regressao_linear(int size, double vetor_x[], double vetor_y[])
+{
+    double media_x, media_y, soma_xy, a, b;
+    int i;
+
+    media_x = encontrar_media_valores(size, vetor_x);
+    media_y = encontrar_media_valores(size, vetor_y);
+
+
+    for (i = 0; i < size; i++){
+            soma_xy += vetor_x[i] * vetor_y[i];
+    }
+    a = (soma_xy - media_x * media_y) / pow(encontrar_desvio_padrao(size, media_x, vetor_x), 2);
+    b = media_y - a * media_x;
+
+    printf("\n\nRegressao Linear: ");
+    printf("y = %.5lfx + %.5lf ", a, b);
+
 }
 /* FIM ESTATÍSTICA ----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
