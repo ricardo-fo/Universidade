@@ -15,9 +15,6 @@
 #include <math.h> // uso: log10(); pow(); sqrt();
 #include <ctype.h> // uso: isdigit();
 
-// Correção de divisões por 0
-#define DIV_0 0.000001
-
 // Opções do menu
 void calcular_arquivo_existente(void);
 void criar_arquivo_novo(void);
@@ -156,6 +153,7 @@ void calcular_arquivo_existente()
     int casas_decimais = quantidade_casas_decimais(size, vetor_string_a); // quantidade de casas após a vírgula que é usado na primeira coluna.
     printf("\nSobre os dados do primeiro conjunto (coluna da esquerda):");
     tabela_frequencias(size, vetor_a, casas_decimais);
+
     printf("\n============================================================\n");
 
     casas_decimais = quantidade_casas_decimais(size, vetor_string_b); // quantidade de casas após a vírgula que é usado na segunda coluna.
@@ -378,6 +376,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     // Moda para valores não agrupados
     double moda_valores[size];
     int qntdd_modas = 0;
+
     if(encontrar_moda_valores(size, vetor, moda_valores, &qntdd_modas) == 0){
         printf("\nNao ha' moda.");
     } else {
@@ -389,6 +388,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
 
     // Moda para valores agrupados
     double moda_faixas[qntdd_faixa_valores];
+
     if(encontrar_moda_faixas(qntdd_faixa_valores, faixa_valores, frequencia, amplitude_faixas, moda_faixas, &qntdd_modas) == 0){
         printf("\nNao ha' moda.");
     } else {
@@ -402,6 +402,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
 
     // Desvio padrão para valores não agrupados
     double desvio_padrao = encontrar_desvio_padrao(size, media_valores, vetor);
+
     printf("\nDesvio padrao = %.*lf", casas_decimais, desvio_padrao);
     printf("\n");
 
@@ -410,6 +411,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     double quaritl_inf = encontrar_quartil_inferior(size, vetor);
     double quaritl_sup = encontrar_quartil_superior(size, vetor);
     double box_plot[5];
+
     encontrar_box_plot(quaritl_inf, mediana, quaritl_sup, size, vetor, box_plot);
     printf("\nBox-Plot:");
     printf("\nLimite inferior = %.*lf", casas_decimais, box_plot[0]);
@@ -417,8 +419,11 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     printf("\nMediana = %.*lf", casas_decimais, box_plot[2]);
     printf("\nQuartil superior = %.*lf", casas_decimais, box_plot[3]);
     printf("\nLimite superior = %.*lf", casas_decimais, box_plot[4]);
+
+    // Outliers
     int qntdd_outliers;
     double outliers[size];
+
     encontrar_outliers(box_plot[0], box_plot[4], &qntdd_outliers, vetor, size, outliers);
     if(qntdd_outliers > 0){
         printf("\nOutliers: ");
@@ -447,8 +452,9 @@ void encontrar_faixa_valores(double menor, int size, double amplitude_faixas, do
 
 void encontar_ponto_medio(int size, double faixa_valores[], float ponto_medio[])
 {
-    /* Este procedimento encontra o ponto medio de um conjunto de daos não agrupados.
-     * Tem como paramêtros */
+    /* Este procedimento encontra o ponto médio de um conjunto de dados não agrupados.
+     * Tem como paramêtros o tamanho do vetor do ponto médio, o vetor das faixas de valores e o vetor para armazenar os
+     * pontos médios. */
     int i;
 
     for(i = 0; i < size; i++){
@@ -458,6 +464,9 @@ void encontar_ponto_medio(int size, double faixa_valores[], float ponto_medio[])
 
 void encontrar_frequencias(int size_faixa, double faixa_valores[], int size_vetor, double vetor[], int frequencia[])
 {
+    /* Este procedimento encontra as frequências de cada faixa de valor, tem como paramêtros o tamanho das faixas de valores,
+     * o vetor que armazena as faixas de valores, o tamanho do vetor que contém os dadso, o vetor que contém os dados não agrupados
+     * e um vetor para armazenar as frequências. */
     int i, j, contador;
 
     for(i = 0; i < size_faixa; i++){
@@ -473,6 +482,8 @@ void encontrar_frequencias(int size_faixa, double faixa_valores[], int size_veto
 
 void encontrar_frequencias_acumuladas(int size, int frequencia[], int frequencia_acumulada[])
 {
+    /* Este procedimento encontra as frequências acumuladas da tabela de frequências, tem como paramêtros, o tamanho do vetor de frequências,
+     * o vetor com os valores das frequências, um vetor para armazenar as frequências acumuladas. */
     int i;
 
     frequencia_acumulada[0] = frequencia[0];
@@ -483,6 +494,8 @@ void encontrar_frequencias_acumuladas(int size, int frequencia[], int frequencia
 
 void encontrar_frequencias_relativas(int size_faixas, int size_valores, int frequencia[], float frequencia_relativa[])
 {
+    /* Este procedimento encontra as frequências relativas da tabela de frequências, tem como paramêtros, a quantidade de faixa de valores,
+     * a quantidade de valores, o vetor que armazena as frequências e um vetor para armazenar as frequências relativas.  */
     int i;
 
     for(i = 0; i < size_faixas; i++){
@@ -493,6 +506,9 @@ void encontrar_frequencias_relativas(int size_faixas, int size_valores, int freq
 
 void encontrar_frequencias_relativas_acumuladas(int size_faixas, int size, int frequencia_acumulada[], float frequencia_relativa_acumulada[])
 {
+    /* Este procedimento encontras as frequências relativas acumuladas da tabela de frequências, tem como paramêtros a quantidade de faixas de
+     * valores, a quantidade de valores não agrupados, o vetor com que armazena as frequências acumuladas, um vetor para armazenar as frequências
+     * relativas acumuladas. */
     int i;
 
     for(i = 0; i < size_faixas; i++){
@@ -503,6 +519,8 @@ void encontrar_frequencias_relativas_acumuladas(int size_faixas, int size, int f
 
 double encontrar_media_valores(int size, double vetor[])
 {
+    /* Esta função econtra a média dos dados não agrupados, tem como paramêtros a quantidade de dados e o vetor que armazena os dados.
+     * Retorna a média dos dados contidos no vetor. */
     if(size == 0) return 0;
 
     return (soma_simples_double(size, vetor)/size);
@@ -510,6 +528,9 @@ double encontrar_media_valores(int size, double vetor[])
 
 double encontrar_media_faixas(int size, float ponto_medio[], int frequencias[])
 {
+    /* Esta função encontra a média dos dados agrupados, as faixas de valores, tem como paramêtros a quantidade de faixas de valores, o vetor que
+     * armazena os pontos médios das faixas de valores e o vetor de que armazena as frequências de cada faixa de valor. 
+     * Retorna a média as faixas de valores. */
     if(size == 0) return 0;
     int soma = soma_simples_int(size, frequencias);
     if(soma == 0){
@@ -521,6 +542,10 @@ double encontrar_media_faixas(int size, float ponto_medio[], int frequencias[])
 
 int encontrar_moda_valores(int size, double vetor[], double moda[], int * qntdd_modas)
 {
+    /* Esta função encontra a moda dos dados não agrupados, tem como paramêtros a quantidade de dados não agrupados, o vetor que contém os
+     * dados não agrupados, um vetor para armazenar as modas (caso seja multimodal) e o ponteiro de um inteiro com a quantidade de modas que o
+     * vetor de modas irá armazenar. 
+     * Retorna 0 caso não haja moda, ou retorna 1, caso haja moda. */
     int i, j, contador, maior_repeticao = 0, quantidade_repeticoes[size];
 
     for(i = 0; i < size; i++){ //Contar quantas repetições há para cada valor
@@ -566,6 +591,10 @@ int encontrar_moda_valores(int size, double vetor[], double moda[], int * qntdd_
 
 int encontrar_moda_faixas(int size, double faixa_valores[], int frequencia[], double amplitude_modal, double moda[], int * qntdd_modas)
 {
+    /* Esta função encontra a moda das faixas de valores, caso hajam, tem como paramêtros a quantidade de faixa de valores, o vetor com as
+     * faixas de valores, o vetor com as frequências, a amplitude modal, o vetor para armazenar as modas (caso seja multimodal) e um ponteiro
+     * para inteiro que indica a quantidade de modas no vetor.
+     * Retorna 0 caso não haja moda, ou retorna 1, caso haja moda. */
     int i, j, k = 0, maior_repeticao = 0;
     bool ja_esta;
 
@@ -601,6 +630,8 @@ int encontrar_moda_faixas(int size, double faixa_valores[], int frequencia[], do
 
 double encontrar_mediana(int size, double vetor[])
 {
+    /* Esta função encontra a mediana dos dados não agrupados. Tem como paramêtros a quantidade de dados e o vetor que armazena os dados não agrupados.
+     * Retorna o valor da mediana. */
     int i;
     double aux[size];
 
@@ -618,6 +649,9 @@ double encontrar_mediana(int size, double vetor[])
 
 double encontrar_quartil_inferior(int size, double vetor[])
 {
+    /* Esta função econtra o quartil inferior do conjunto de dados não agrupados, tem como paramêtros a quantidade de dados não agrupados e o vetor que armazena
+     * esses dados.
+     * Retorna o valor do quartil inferior. */
     int i;
     double aux[size];
 
@@ -632,6 +666,9 @@ double encontrar_quartil_inferior(int size, double vetor[])
 
 double encontrar_quartil_superior(int size, double vetor[])
 {
+    /* Esta função econtra o quartil superior do conjunto de dados não agrupados, tem como paramêtros a quantidade de dados não agrupados e o vetor que armazena
+     * esses dados.
+     * Retorna o valor do quartil superior. */
     int i;
     double aux[size];
 
@@ -646,6 +683,8 @@ double encontrar_quartil_superior(int size, double vetor[])
 
 void encontrar_box_plot(double quaritl_inf, double mediana, double quaritl_sup, int size, double vetor[], double box_plot[])
 {
+    /* Este procedimento encontra os valores para o box-plot, tem como paramêtros o valor do quartil inferior, a mediana, o valor do quartil superior,
+     * a quantidade de dados não agrupados, o vetor que contém esses dados e um vetor para armazenar os dados do box-plot. */
     double interquartil = quaritl_sup - quaritl_inf;
     double lim_inf = quaritl_inf - 1.5 * interquartil;
     double lim_sup = quaritl_sup + 1.5 * interquartil;
@@ -659,6 +698,9 @@ void encontrar_box_plot(double quaritl_inf, double mediana, double quaritl_sup, 
 
 void encontrar_outliers(double lim_inf, double lim_sup, int * qntdd_outliers, double vetor[], int size, double outliers[])
 {
+    /* Este procedimento verifica se existem outliers baseado nos dados dos achados para o box-plot. Tem como paramêtros o limite inferior,
+     * o limite superior, um ponteiro de inteiro que indica a quantidade de outliers encontrados, o vetor que contém os dados não agrupados,
+     * a quantidade de dados não agrupados e um vetor para armazenar os outliers. */
     int i, k = 0;
 
     double aux[size];
@@ -679,6 +721,9 @@ void encontrar_outliers(double lim_inf, double lim_sup, int * qntdd_outliers, do
 
 double encontrar_desvio_padrao(int size, double media, double vetor[])
 {
+    /* Esta função encontra o desvio padrão de um conjunto de dados, tem como paramêtros a quantidade de dados não agrupados, a media desses dados,
+     * o vetor que armazena os dados não agrupados.
+     * Retorna o valor do desvio padrão. */
     int i;
     double soma = 0;
 
@@ -691,6 +736,7 @@ double encontrar_desvio_padrao(int size, double media, double vetor[])
 
 void encontrar_correlacao_Pearson(int size, double vetor_x[], double vetor_y[])
 {
+    /* Este procedimento encontra a correlacao de Pearson, tem como paramêtros a quantidade de dados não agrupados dos dois vetores a serem analisados.*/
     double media_x = encontrar_media_valores(size, vetor_x);
     double media_y = encontrar_media_valores(size, vetor_y);
     double soma_xy = 0, r;
@@ -699,9 +745,6 @@ void encontrar_correlacao_Pearson(int size, double vetor_x[], double vetor_y[])
     for (i = 0; i < size; i++){
         soma_xy += (vetor_x[i] - media_x) * (vetor_y[i] - media_y);
     }
-
-    double soma_x = soma_simples_double(size, vetor_x);
-    double soma_y = soma_simples_double(size, vetor_y);
 
     double desvio_padrao_x = encontrar_desvio_padrao(size, media_x, vetor_x);
     double desvio_padrao_y = encontrar_desvio_padrao(size, media_y, vetor_y);
@@ -756,6 +799,8 @@ void encontrar_correlacao_Pearson(int size, double vetor_x[], double vetor_y[])
 
 void encontrar_regressao_linear(int size, double vetor_x[], double vetor_y[])
 {
+    /* Este procedimento encontra a equação da regressão linear, tem como paramêtros a quantidade de dados não agrupados, e os dois vetores contendo os dados
+     * que serão analisados. */
     double soma_xy = 0, a, b, soma_x2 = 0;
     double media_x = encontrar_media_valores(size, vetor_x);
     double media_y = encontrar_media_valores(size, vetor_y);
@@ -781,11 +826,16 @@ void encontrar_regressao_linear(int size, double vetor_x[], double vetor_y[])
 /* FERRAMENTAS --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 double arredondar(double valor, int casas)
 {
+    /* Esta função arredonda para cima um double a apartir da quantidade de casas decimais informadas. 
+     * Retorna o número arredondado. */
     return ( ceil(valor * pow(10, casas)) / pow(10, casas) );
 }
 
 int quantidade_casas_decimais(int size, char vetor_string[][31])
 {
+    /* Esta função encontra a quantidade de casas decimais usadas no arquivo para que possa ser encontrado a amplitude das faixas de valores.
+     * Tem como paramêtros a quantidade de dados da uma coluna do arquivo e um vetor de strings que armazena os dados em forma de string. 
+     * Retorna o número de casas decimais desse conjunto de dados. */
     int i, j, contador, maior = 0;
     char str_aux[31];
 
@@ -811,6 +861,7 @@ int quantidade_casas_decimais(int size, char vetor_string[][31])
 
 bool is_number(const char token[])
 {
+    /* Esta função verifica se uma string passada é um número, caso seja, retorna true, caso seja, ou caso não seja, falso.*/
     int i;
     bool dot = true;
 
@@ -828,6 +879,7 @@ bool is_number(const char token[])
 
 int maior_valor(int size, double vetor[])
 {
+    /* Esta função encontra o maior valor de um vetor e retorna seu indíce. */
     int i, maior = 0;
 
     for(i = 0; i < size; i++){
@@ -841,6 +893,7 @@ int maior_valor(int size, double vetor[])
 
 int menor_valor(int size, double vetor[])
 {
+    /* Esta função encontra o menor valor de um vetor e retorna seu indíce. */
     int i, menor = 0;
 
     for(i = 0; i < size; i++){
@@ -854,6 +907,7 @@ int menor_valor(int size, double vetor[])
 
 double soma_simples_double(int size, double vetor[])
 {
+    /* Somatório de um vetor de doubles. */
     int i;
     double soma = 0;
 
@@ -866,6 +920,7 @@ double soma_simples_double(int size, double vetor[])
 
 int soma_simples_int(int size, int vetor[])
 {
+    /* Somatório de um vetor de inteiros. */
     int i, soma = 0;
 
     for(i = 0; i < size; i++){
@@ -877,6 +932,7 @@ int soma_simples_int(int size, int vetor[])
 
 float soma_produtos(int size, float vetor_a[], int vetor_b[])
 {
+    /* Somatório de um vetor de float com um vetor de inteiros, sendo que são feitas multiplicações entre os elementos dos vetores. */
     int i;
     float soma = 0;
 
@@ -889,6 +945,7 @@ float soma_produtos(int size, float vetor_a[], int vetor_b[])
 
 int particao(double vetor[], int e, int d)
 {
+    /* Parte do algoritmo de quicksort */
     double pivo = vetor[d];
     int j, i = (e - 1);
 
@@ -904,6 +961,7 @@ int particao(double vetor[], int e, int d)
 
 void troca(double * a, double * b)
 {
+    /* Parte do algoritmo de quicksort */
     double aux = *a;
     *a = *b;
     *b = aux;
@@ -911,6 +969,7 @@ void troca(double * a, double * b)
 
 void quick_sort(double vetor[], int e, int d)
 {
+    /* Algoritmo de ordenação quicksort. */
     if(e < d){
         int pi = particao(vetor, e, d);
 
@@ -919,24 +978,3 @@ void quick_sort(double vetor[], int e, int d)
     }
 }
 /* FIM FERRAMENTAS ----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
-/******************************************************************************************************
- * Sobre o programa:
- * Funcionalidade:
- * 1. Leia dois conjuntos de dados numéricos a partir de um arquivo-texto que, se não existir, permita que
- * o usuário o crie e insira dados nele.
- *     1.1. Caso o arquivo exista, ele deve ter duas colunas separadas por vírgula, ponto e vírgula,
- *     tabulação, ou outro símbolo definido pelo usuário.
- *
- * 2. Elabore a tabela de frequências com cada conjunto de dados deste arquivo, sendo que a tabela deve
- * conter as faixas de valores, o ponto médio, a frequência, a frequência acumulada e as respectivas
- * frequências relativas;
- *
- * 3. Estime a moda, média e o desvio padrão dos dados usando tanto os valores do arquivo, quanto a
- * tabela de frequências;
- *
- * 4. Estime os valores para o box-plot indicando os outliers para cada um dos conjuntos de dados, caso
- * existam;
- *
- * 5. Calcule o coeficiente de correlação de Pearson e os coeficientes da reta de mínimos quadrados.
- ********************************************************************************************************/
