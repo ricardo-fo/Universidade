@@ -6,7 +6,7 @@
  * Nome: Vitor Kuribara.
  * Profº.: José Fontebasso Neto.
  * Discplina: Probabilidade e Estatística - I.
- * Universidade  Católica de Santos - Maio de 2019.
+ * Universidade Católica de Santos - Maio de 2019.
 */
 #include <stdio.h> // uso: inptus e outputs.
 #include <stdlib.h> // uso: fprintf(); fscanf();
@@ -748,7 +748,7 @@ void encontrar_correlacao_Pearson(int size, double vetor_x[], double vetor_y[])
 
     double desvio_padrao_x = encontrar_desvio_padrao(size, media_x, vetor_x);
     double desvio_padrao_y = encontrar_desvio_padrao(size, media_y, vetor_y);
-    r = soma_xy / ((size - 1) * (desvio_padrao_x * desvio_padrao_y));
+    r = ((1 / (double)size) * soma_xy) / (desvio_padrao_x * desvio_padrao_y);
 
     if(r <= 1 && r >= -1){
         printf("\n\nCorrelacao de Pearson:\nr = %lf ", r);
