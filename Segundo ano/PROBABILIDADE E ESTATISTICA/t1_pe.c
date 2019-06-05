@@ -439,7 +439,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
 void encontrar_faixa_valores(double menor, int size, double amplitude_faixas, double faixa_valores[])
 {
     /* Este procedimento encontra as faixas de valores que serão usadas na tabela de frequências.
-     * Tem como paramêtros o menor valor, o tamanho do vetor que as faixas serão inseridas, 
+     * Tem como paramêtros o menor valor, o tamanho do vetor que as faixas serão inseridas,
      * a amplitude das faixas e o vetor para armazenar as faixas de valores. */
     int i;
 
@@ -529,7 +529,7 @@ double encontrar_media_valores(int size, double vetor[])
 double encontrar_media_faixas(int size, float ponto_medio[], int frequencias[])
 {
     /* Esta função encontra a média dos dados agrupados, as faixas de valores, tem como paramêtros a quantidade de faixas de valores, o vetor que
-     * armazena os pontos médios das faixas de valores e o vetor de que armazena as frequências de cada faixa de valor. 
+     * armazena os pontos médios das faixas de valores e o vetor de que armazena as frequências de cada faixa de valor.
      * Retorna a média as faixas de valores. */
     if(size == 0) return 0;
     int soma = soma_simples_int(size, frequencias);
@@ -544,7 +544,7 @@ int encontrar_moda_valores(int size, double vetor[], double moda[], int * qntdd_
 {
     /* Esta função encontra a moda dos dados não agrupados, tem como paramêtros a quantidade de dados não agrupados, o vetor que contém os
      * dados não agrupados, um vetor para armazenar as modas (caso seja multimodal) e o ponteiro de um inteiro com a quantidade de modas que o
-     * vetor de modas irá armazenar. 
+     * vetor de modas irá armazenar.
      * Retorna 0 caso não haja moda, ou retorna 1, caso haja moda. */
     int i, j, contador, maior_repeticao = 0, quantidade_repeticoes[size];
 
@@ -607,7 +607,7 @@ int encontrar_moda_faixas(int size, double faixa_valores[], int frequencia[], do
     double aux;;
     for(i = 1; i < size; i++){
         if(frequencia[maior_repeticao] == frequencia[i]){
-            aux = faixa_valores[(i % 2 == 0? i - 1 : i)] + (amplitude_modal * (frequencia[i + 1] / ((frequencia[i - 1] + frequencia[i + 1]) == 0? DIV_0 : (frequencia[i - 1] + frequencia[i + 1])) ));
+            aux = faixa_valores[(i % 2 == 0? i - 1 : i)] + (amplitude_modal * (frequencia[i + 1] / (frequencia[i - 1] + frequencia[i + 1]) ));
             ja_esta = false;
             for(j = 0; j < i; j++){ // não repetir valores no vetor que armazena as modas
                 if(moda[j] == aux){
@@ -826,7 +826,7 @@ void encontrar_regressao_linear(int size, double vetor_x[], double vetor_y[])
 /* FERRAMENTAS --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 double arredondar(double valor, int casas)
 {
-    /* Esta função arredonda para cima um double a apartir da quantidade de casas decimais informadas. 
+    /* Esta função arredonda para cima um double a apartir da quantidade de casas decimais informadas.
      * Retorna o número arredondado. */
     return ( ceil(valor * pow(10, casas)) / pow(10, casas) );
 }
@@ -834,7 +834,7 @@ double arredondar(double valor, int casas)
 int quantidade_casas_decimais(int size, char vetor_string[][31])
 {
     /* Esta função encontra a quantidade de casas decimais usadas no arquivo para que possa ser encontrado a amplitude das faixas de valores.
-     * Tem como paramêtros a quantidade de dados da uma coluna do arquivo e um vetor de strings que armazena os dados em forma de string. 
+     * Tem como paramêtros a quantidade de dados da uma coluna do arquivo e um vetor de strings que armazena os dados em forma de string.
      * Retorna o número de casas decimais desse conjunto de dados. */
     int i, j, contador, maior = 0;
     char str_aux[31];
