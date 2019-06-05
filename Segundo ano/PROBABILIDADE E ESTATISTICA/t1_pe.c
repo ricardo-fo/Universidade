@@ -164,10 +164,13 @@ void calcular_arquivo_existente()
     printf("\n============================================================\n");
 
     encontrar_correlacao_Pearson(size, vetor_a, vetor_b);
+    encontrar_regressao_linear(size, vetor_a, vetor_b);
 }
 
 void criar_arquivo_novo()
 {
+    /* Este procedimento valida um nome de arquivo, sua extensão e, caso seja tudo
+     * permitido, um  arquivo é criado */
     char novo_arquivo[101];
     inserir_nome_arquivo(novo_arquivo);
     char * extensao;
@@ -202,6 +205,8 @@ void inserir_nome_arquivo(char nome_arquivo[])
 
 int verificar_extensao(const char * nome_arquivo, const char * tipo)
 {
+    /* Esta função veritifca se é possível criar um arquivo com a extensão passada
+     * Caso seja possível, retonra 0, caso contrário, retona 1*/
     char * extensao = strrchr(nome_arquivo, '.');
     if(extensao == NULL){
         return 1;
@@ -233,6 +238,8 @@ FILE * abrir_arquivo(const char * nome_arquivo, const char * tipo)
 
 void inserir_dados(FILE * p_arquivo)
 {
+    /* Este procedimento insere dados numa stream passada como parâmetro,
+     * verificando se as operações são possíveis de serem feitas */
     char buffer;
     char separador;
     int qntdd_dados, i;
@@ -240,26 +247,27 @@ void inserir_dados(FILE * p_arquivo)
 
     printf("\nSeu arquivo deve possuir duas colunas de dados numericos.");
     printf("\nQuantidade de dados a ser inserido: ");
-    while((scanf("%d", &qntdd_dados) != 1) || qntdd_dados < 0){
-        while((buffer = getchar()) != '\n');
+    while((scanf("%d", &qntdd_dados) != 1) || qntdd_dados < 0){ // validação da quantidade de dados (apenas inteiros)
+        while((buffer = getchar()) != '\n'); // limpeza do buffer
         printf("\nEntrada invalida.\n");
         printf("\nQuantidade de dados a ser inserido: ");
     }
 
     printf("\nSimbolo a ser usado: ");
     scanf(" %c", &separador);
-    while((buffer = getchar()) != '\n');
-    while(separador == '.' || isdigit(separador) != 0){
+    while((buffer = getchar()) != '\n'); // limpeza do buffer
+
+    while(separador == '.' || isdigit(separador) != 0){ // validação e prevenção de erros no separador passado
         printf("\n******************************************************************************************************");
         fprintf(stderr, "\nErro: '%c' nao e' um separador valido. Nao utilize o caractere ponto ou numeros como separador.", separador);
         printf("\n******************************************************************************************************");
         printf("\nSimbolo a ser usado: ");
         scanf(" %c", &separador);
-        while((buffer = getchar()) != '\n');
+        while((buffer = getchar()) != '\n'); // limpeza do buffer
     }
 
     printf("\nInsercao de dados. Utilize espaco para cada coluna. Exemplo:\n2.8 3.7\n4.6 5.5\n1.9 7.3\n. . .\n");
-    for(i = 0; i < qntdd_dados/2; i++){
+    for(i = 0; i < qntdd_dados/2; i++){ // inserção dos dados no arquivo
         printf(">>> ");
         scanf("%lf %lf", &dado_a, &dado_b);
         fprintf(p_arquivo, "%lf%c%lf%c", dado_a, separador, dado_b, '\n');
@@ -268,10 +276,12 @@ void inserir_dados(FILE * p_arquivo)
 
 int quantidade_valores(FILE * p_arquivo, const char * separador)
 {
+    /* Esta função obtém a quantidade de valores em um arquivo, retornando a quantidade de
+     * valores armazenado, recebe como argumento a stream do arquivo e o separador usado */
     int i, contador = 0;
     char linha[51];
-    while(fgets(linha, 51, p_arquivo) != NULL){
-        if(strpbrk(linha, separador) != NULL){
+    while(fgets(linha, 51, p_arquivo) != NULL){ // leitura do arquivo
+        if(strpbrk(linha, separador) != NULL){ // busca pelo separador
             contador++;
         }
     }
@@ -280,39 +290,45 @@ int quantidade_valores(FILE * p_arquivo, const char * separador)
 
 int coletar_dados(int size, double vetor_a[], double vetor_b[], FILE * p_arquivo, const char * nome_arquivo, const char * separador, char vetor_string_a[][31], char vetor_string_b[][31])
 {
+    /* Esta função coleta dados de um arquivo, recebe como parâmetros a quantidade de dados,
+     * um vetor para armazenar os dados da coluna a, outro vetor para armazenar os dados da coluna
+     * b, uma stream de arquivo, o nome do arquivo, o separador usado e dois vetores de strings
+     * para validar a quantidade de casas decimais presentes nos dados do arquivo */
     char linha[51], * token, aux[51];
     int i = 0, j = 0;
-    rewind(p_arquivo);
+    rewind(p_arquivo); // movimenta o indicador de leitura para o início do arquivo
 
-    while(fgets(linha, 51, p_arquivo) != NULL){
-        token = strtok(linha, separador);
-        if(token == NULL){
+    while(fgets(linha, 51, p_arquivo) != NULL){ // leitura do arquivo
+        token = strtok(linha, separador); // divide o arquivo a partir do separador passado
+        if(token == NULL){ // verifica se há o separador na linha analisada
+            return 1; // caso não haja o separador, retorna 1
+        }
+        if(!is_number(token)){ // verifica se a linha lida possui apenas números e o separador
+            return 1; // caso haja algo não numérico na linha
+        }
+        sprintf(aux, "%lf", atof(token)); // atribui a uma string a conversão do dado da linha (string) para um double
+        strcpy(vetor_string_a[i], aux); // copia o conteudo de aux para o vetor de strings
+        vetor_a[i++] = atof(token); // armazena o dado num vetor de doubles
+        token = strtok(NULL, separador); // vai para o próximo dado da linha
+        if(token == NULL){ // caso não haja o separador buscado
             return 1;
         }
-        if(!is_number(token)){
-            return 1;
-        }
-        sprintf(aux, "%lf", atof(token));
-        strcpy(vetor_string_a[i], aux);
-        vetor_a[i++] = atof(token);
-        token = strtok(NULL, separador);
-        if(token == NULL){
-            return 1;
-        }
-        if(!is_number(token)){
+        if(!is_number(token)){ // repetição das instruções feitas nos dados da coluna A para os dados da coluna B
             return 1;
         }
         sprintf(aux, "%lf", atof(token));
         strcpy(vetor_string_b[i], aux);
         vetor_b[j++] = atof(token);
     }
-    return 0;
+    return 0; // coleta de dados bem sucedida
 }
 /* FIM MANIPULAÇÃO DE ARQUIVOS ---------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /* ESTATÍSTICA -------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 void tabela_frequencias(int size, double vetor[], int casas_decimais)
 {
+    /* Este procedimento cria a tabela de frequências, tem como paramêtros o tamanho do vetor analisado,
+     * o vetor a ser analisado, e a quantidade de casas decimais dos dados  */
     int qntdd_faixa_valores = ceil(3.3 * log10(size));
     double maior = vetor[maior_valor(size, vetor)];
     double menor = vetor[menor_valor(size, vetor)];
@@ -371,7 +387,6 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
         }
     }
 
-
     // Moda para valores agrupados
     double moda_faixas[qntdd_faixa_valores];
     if(encontrar_moda_faixas(qntdd_faixa_valores, faixa_valores, frequencia, amplitude_faixas, moda_faixas, &qntdd_modas) == 0){
@@ -408,7 +423,7 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
     if(qntdd_outliers > 0){
         printf("\nOutliers: ");
         for(i = 0; i < qntdd_outliers; i++){
-            printf("%.*lf, ", outliers[i]);
+            printf("%.*lf, ", casas_decimais, outliers[i]);
         }
     } else {
         printf("\nNao ha' outliers.");
@@ -418,6 +433,9 @@ void tabela_frequencias(int size, double vetor[], int casas_decimais)
 
 void encontrar_faixa_valores(double menor, int size, double amplitude_faixas, double faixa_valores[])
 {
+    /* Este procedimento encontra as faixas de valores que serão usadas na tabela de frequências.
+     * Tem como paramêtros o menor valor, o tamanho do vetor que as faixas serão inseridas, 
+     * a amplitude das faixas e o vetor para armazenar as faixas de valores. */
     int i;
 
     faixa_valores[0] = menor;
@@ -429,6 +447,8 @@ void encontrar_faixa_valores(double menor, int size, double amplitude_faixas, do
 
 void encontar_ponto_medio(int size, double faixa_valores[], float ponto_medio[])
 {
+    /* Este procedimento encontra o ponto medio de um conjunto de daos não agrupados.
+     * Tem como paramêtros */
     int i;
 
     for(i = 0; i < size; i++){
@@ -492,7 +512,10 @@ double encontrar_media_faixas(int size, float ponto_medio[], int frequencias[])
 {
     if(size == 0) return 0;
     int soma = soma_simples_int(size, frequencias);
-    if(soma == 0) return(soma_produtos(size, ponto_medio, frequencias)/DIV_0);
+    if(soma == 0){
+        printf("\nDivisao por 0.");
+        exit(1);
+    }
     return(soma_produtos(size, ponto_medio, frequencias)/soma);
 }
 
@@ -663,55 +686,90 @@ double encontrar_desvio_padrao(int size, double media, double vetor[])
         soma += pow((vetor[i] - media), 2);
     }
 
-    return sqrt( ((1 / size) * soma) );
+    return sqrt( ((1 / (double)size) * soma) );
 }
 
 void encontrar_correlacao_Pearson(int size, double vetor_x[], double vetor_y[])
 {
-    double media_x, media_y, soma_xy, r;
+    double media_x = encontrar_media_valores(size, vetor_x);
+    double media_y = encontrar_media_valores(size, vetor_y);
+    double soma_xy = 0, r;
     int i;
-    media_x = encontrar_media_valores(size, vetor_x);
-    media_y = encontrar_media_valores(size, vetor_y);
-
 
     for (i = 0; i < size; i++){
-            soma_xy += vetor_x[i] * vetor_y[i];
+        soma_xy += (vetor_x[i] - media_x) * (vetor_y[i] - media_y);
     }
 
-    double aux = encontrar_desvio_padrao(size, media_x, vetor_x) * encontrar_desvio_padrao(size, media_y, vetor_y);
-    if(aux == 0){
-        printf("\nDivisao por 0.");
-        return;
-    }
-    r = (soma_xy - media_x * media_y) / aux;
-    printf("\n\nCorrelacao de Pearson:\nr = %lf ", r);
+    double soma_x = soma_simples_double(size, vetor_x);
+    double soma_y = soma_simples_double(size, vetor_y);
 
-    if (r > 0.6){
-        printf("(Correlacao forte)");
-    }
-    else {
-        if (r > 0.3){
-            printf("(Correlacao fraca)");
-        }
-        else{
-            printf("(Correlacao muito fraca ou inexistente)");
+    double desvio_padrao_x = encontrar_desvio_padrao(size, media_x, vetor_x);
+    double desvio_padrao_y = encontrar_desvio_padrao(size, media_y, vetor_y);
+    r = soma_xy / ((size - 1) * (desvio_padrao_x * desvio_padrao_y));
+
+    if(r <= 1 && r >= -1){
+        printf("\n\nCorrelacao de Pearson:\nr = %lf ", r);
+        if(r > 0)
+        {
+            if(r >= 0.9){
+                printf("\nCorrelacao positiva muito forte.");
+            } else {
+                if(r >= 0.7 && r < 0.9){
+                    printf("\nCorrelacao positiva forte.");
+                } else {
+                    if(r >= 0.5 && r < 0.7){
+                        printf("\nCorrelacao positiva moderada.");
+                    } else {
+                        if(r >= 0.3 && r < 0.5){
+                            printf("\nCorrelacao positiva fraca.");
+                        } else {
+                            if(r >= 0 && r < 0.3){
+                                printf("\nCorrelacao positiva desprezivel.");
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            if(r <= -0.9){
+                printf("\nCorrelacao positiva muito forte.");
+            } else {
+                if(r <= -0.7 && r > -0.9){
+                    printf("\nCorrelacao positiva forte.");
+                } else {
+                    if(r <= -0.5 && r > -0.7){
+                        printf("\nCorrelacao positiva moderada.");
+                    } else {
+                        if(r <= -0.3 && r > -0.5){
+                            printf("\nCorrelacao positiva fraca.");
+                        } else {
+                            if(r <= 0 && r > -0.3){
+                                printf("\nCorrelacao positiva desprezivel.");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 void encontrar_regressao_linear(int size, double vetor_x[], double vetor_y[])
 {
-    double media_x, media_y, soma_xy, a, b;
+    double soma_xy = 0, a, b, soma_x2 = 0;
+    double media_x = encontrar_media_valores(size, vetor_x);
+    double media_y = encontrar_media_valores(size, vetor_y);
+    double soma_x = soma_simples_double(size, vetor_x);
+    double soma_y = soma_simples_double(size, vetor_y);
     int i;
 
-    media_x = encontrar_media_valores(size, vetor_x);
-    media_y = encontrar_media_valores(size, vetor_y);
-
-
     for (i = 0; i < size; i++){
-            soma_xy += vetor_x[i] * vetor_y[i];
+            soma_xy += (vetor_x[i] * vetor_y[i]);
     }
-    a = (soma_xy - media_x * media_y) / pow(encontrar_desvio_padrao(size, media_x, vetor_x), 2);
+    for(i = 0; i < size; i++){
+        soma_x2 += (pow(vetor_x[i], 2));
+    }
+    a = ((size * soma_xy - soma_x * soma_y) / (size * soma_x2 - pow(soma_x, 2)));
     b = media_y - a * media_x;
 
     printf("\n\nRegressao Linear: ");
